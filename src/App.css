@@ -1,0 +1,12 @@
+* {
+  font-family: 'Assistant';
+}
+@font-face {
+  font-family: 'Assistant';
+  src: url('../src/assets/fonts/Assistant-VariableFont_wght.ttf') format('truetype');
+}
+
+body {
+  margin: 0;
+}
+
