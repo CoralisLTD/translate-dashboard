@@ -4,6 +4,7 @@ import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
 import { reverseText, stripHtmlAndSpecialChars } from "../utils/text";
+import { useNavigate } from "react-router-dom";
 
 const Title = styled.div(() => ({
   fontSize: 30
@@ -37,6 +38,7 @@ const Proceedures = ({ translateStore }) => {
   // eslint-disable-next-line no-unused-vars
   const [lang, setLang] = useState(2);
   const [translation, setTranslation] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,8 +108,12 @@ const Proceedures = ({ translateStore }) => {
             style={{
               display: "flex",
               flexDirection: "row",
-              gap: "12px"
+              gap: "12px",
+              alignItems: "center"
             }}>
+            <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+              בחזרה לדף הראשי
+            </div>
             <Title>תרגום הודעות של פרוצדורות</Title>
             {/* <Button
               style={{ width: 220, marginInlineStart: "auto" }}

@@ -4,6 +4,7 @@ import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
 import { stripHtmlAndSpecialChars } from "../utils/text";
+import { useNavigate } from "react-router-dom";
 
 const Title = styled.div(() => ({
   fontSize: 30
@@ -36,13 +37,16 @@ const Columns = ({ translateStore }) => {
   // eslint-disable-next-line no-unused-vars
   const [lang, setLang] = useState(2);
   const [translation, setTranslation] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       const data = await translateStore.get_TRHELPFORM();
       const list = data?.filter((item) => {
-        let cleanText = stripHtmlAndSpecialChars(item?.TRFORMCLMNHELP_SUBFORM.TEXT);
+        let cleanText = stripHtmlAndSpecialChars(
+          item?.TRFORMCLMNHELP_SUBFORM.TEXT
+        );
         if (!cleanText) return false;
         return true;
       });
@@ -99,13 +103,19 @@ const Columns = ({ translateStore }) => {
             style={{
               display: "flex",
               flexDirection: "row",
-              gap: "12px"
+              gap: "12px",
+              alignItems: "center"
             }}>
+            <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+              בחזרה לדף הראשי
+            </div>
             <Title>תרגום עזרות לעמודות מסך</Title>
           </div>
           <ul style={{ padding: 0 }}>
             {items?.map((item, index) => {
-              let cleanText = stripHtmlAndSpecialChars(item?.TRFORMCLMNHELP_SUBFORM.TEXT);
+              let cleanText = stripHtmlAndSpecialChars(
+                item?.TRFORMCLMNHELP_SUBFORM.TEXT
+              );
               // if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {
               //   cleanText =
               //     cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
