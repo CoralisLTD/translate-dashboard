@@ -3,10 +3,7 @@ import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
-import {
-  reverseText,
-  stripHtmlAndSpecialChars,
-} from "../utils/text";
+import { reverseText, stripHtmlAndSpecialChars } from "../utils/text";
 
 const Title = styled.div(() => ({
   fontSize: 30
@@ -37,27 +34,25 @@ const Screens = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [lang, setLang] = useState(2);
   const [translation, setTranslation] = useState(null);
 
   useEffect(() => {
-    const fetchPros = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      const procs = await translateStore.get_TRTRIGMSG();
-      const list = procs.filter((proc) => {
-        let cleanText = stripHtmlAndSpecialChars(proc?.MESSAGE);
+      const data = await translateStore.get_TRTRIGMSG();
+      const list = data?.filter((item) => {
+        let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
         if (!cleanText) return false;
         return true;
       });
       setItems(list);
       setLoading(false);
     };
-    fetchPros();
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const switchTranslationLang = (lang) => {
-    setLang(lang);
-  };
 
   const translate = (params) => {
     if (params.value) {
@@ -110,30 +105,18 @@ const Screens = ({ translateStore }) => {
               gap: "12px"
             }}>
             <Title>תרגום הודעות של מסכים</Title>
-            <Button
-              style={{ width: 220, marginInlineStart: "auto" }}
-              onClick={() => switchTranslationLang(2)}
-              active={lang === 2}>
-              HE to EN
-            </Button>
-            <Button
-              style={{ width: 220, marginInlineEnd: "auto" }}
-              onClick={() => switchTranslationLang(1)}
-              active={lang === 1}>
-              EN to HE
-            </Button>
           </div>
           <ul style={{ padding: 0 }}>
             {items?.map((item, index) => {
               let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
-              if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {
+              if (item.TRTRIGMSGTEXT_SUBFORM?.TEXT) {
                 cleanText =
-                  cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
+                  cleanText + reverseText(item.TRTRIGMSGTEXT_SUBFORM?.TEXT);
               }
-              let translationValue = item.LANGEXTMSG_SUBFORM.find(
+              let translationValue = item.LANGTRIGMSG_SUBFORM.find(
                 (it) => it.LANG === 2
               )?.MESSAGE;
-              if (item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT) {
+              if (item.LANGTRIGMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT) {
                 translationValue =
                   translationValue +
                   item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT;

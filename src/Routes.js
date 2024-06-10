@@ -14,7 +14,7 @@ const AppRoutes = () => {
       <Routes>
         <Route exact path="/proceedures" element={<Proceedures />} />
         <Route exact path="/screens" element={<Screens />} />
-        <Route exact path="/parameteres" element={<Parameteres />} />
+        <Route exact path="/parameters" element={<Parameteres />} />
         <Route exact path="/enteties" element={<Enteties />} />
         <Route exact path="/columns" element={<Columns />} />
         <Route exact path="/" element={<Home />} />

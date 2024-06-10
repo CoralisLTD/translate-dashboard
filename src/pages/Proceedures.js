@@ -3,10 +3,7 @@ import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
-import {
-  reverseText,
-  stripHtmlAndSpecialChars,
-} from "../utils/text";
+import { reverseText, stripHtmlAndSpecialChars } from "../utils/text";
 
 const Title = styled.div(() => ({
   fontSize: 30
@@ -37,22 +34,24 @@ const Proceedures = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [lang, setLang] = useState(2);
   const [translation, setTranslation] = useState(null);
 
   useEffect(() => {
-    const fetchPros = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      const procs = await translateStore.get_TREXTMSG();
-      const list = procs.filter((proc) => {
-        let cleanText = stripHtmlAndSpecialChars(proc?.MESSAGE);
+      const data = await translateStore.get_TREXTMSG();
+      const list = data?.filter((item) => {
+        let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
         if (!cleanText) return false;
         return true;
       });
       setItems(list);
       setLoading(false);
     };
-    fetchPros();
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // const switchTranslationLang = (lang) => {

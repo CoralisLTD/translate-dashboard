@@ -3,10 +3,8 @@ import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
-import {
-  reverseText,
-  stripHtmlAndSpecialChars,
-} from "../utils/text";
+import { reverseText, getCleanText } from "../utils/text";
+// import { TextArea } from "../UI/src/Input";
 
 const Title = styled.div(() => ({
   fontSize: 30
@@ -36,28 +34,25 @@ const List = styled.div(() => ({
 const Screens = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [lang, setLang] = useState(2);
   const [translation, setTranslation] = useState(null);
 
   useEffect(() => {
-    const fetchPros = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      const procs = await translateStore.get_TRHELPEXEC();
-      const list = procs.filter((proc) => {
-        let cleanText = stripHtmlAndSpecialChars(proc?.MESSAGE);
+      const data = await translateStore.get_TRHELPEXEC();
+      const list = data?.filter((item) => {
+        let cleanText = getCleanText(item?.TRHELP_SUBFORM?.TEXT);
         if (!cleanText) return false;
         return true;
       });
       setItems(list);
       setLoading(false);
     };
-    fetchPros();
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const switchTranslationLang = (lang) => {
-    setLang(lang);
-  };
 
   const translate = (params) => {
     if (params.value) {
@@ -77,16 +72,15 @@ const Screens = ({ translateStore }) => {
         MESSAGE: translation[index]?.data.substring(0, 55),
         LANGEXTMSGTEXT_SUBFORM: {
           TEXT: translation[index]?.data.substring(55)
-        },
-        LANG: lang
+        }
       },
       ENAME: translation[index].ENAME,
-      TYPE: translation[index].TYPE
+      TYPE: translation[index].TYPE,
+      LANG: lang,
+      GLANG: "en-GB"
     };
     setLoading(true);
-    const res = isUpdate
-      ? await translateStore.update_TRHELPEXEC(body)
-      : await translateStore.add_TRHELPEXEC(body);
+    const res = await translateStore.update_TRHELPEXEC(body);
     setLoading(false);
     if (res?.isSucceed) {
       console.log("data is saved");
@@ -110,34 +104,23 @@ const Screens = ({ translateStore }) => {
               gap: "12px"
             }}>
             <Title>תרגום עזרות לישויות</Title>
-            <Button
-              style={{ width: 220, marginInlineStart: "auto" }}
-              onClick={() => switchTranslationLang(2)}
-              active={lang === 2}>
-              HE to EN
-            </Button>
-            <Button
-              style={{ width: 220, marginInlineEnd: "auto" }}
-              onClick={() => switchTranslationLang(1)}
-              active={lang === 1}>
-              EN to HE
-            </Button>
           </div>
           <ul style={{ padding: 0 }}>
             {items?.map((item, index) => {
-              let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
+              let cleanText = getCleanText(item?.TRHELP_SUBFORM?.TEXT);
               if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {
                 cleanText =
                   cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
               }
-              let translationValue = item.LANGEXTMSG_SUBFORM.find(
+              let translationValue = item.TRLANGS_SUBFORM.find(
                 (it) => it.LANG === 2
-              )?.MESSAGE;
-              if (item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT) {
-                translationValue =
-                  translationValue +
-                  item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT;
-              }
+              )?.LANGHELP2_SUBFORM?.TEXT;
+              translationValue = getCleanText(translationValue);
+              // if (item.TRLANGS_SUBFORM[0]?.LANGHELP2_SUBFORM?.TEXT) {
+              //   translationValue =
+              //     translationValue +
+              //     item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT;
+              // }
               return (
                 <li
                   key={index}
@@ -158,17 +141,17 @@ const Screens = ({ translateStore }) => {
                     type="text"
                     onChange={(e) => {
                       translate({
+                        index: index,
                         ENAME: item.ENAME,
                         TYPE: item.TYPE,
                         value: e.target.value
                       });
-                      setIsUpdate(!!translationValue);
                     }}
                   />
                   <Button
                     width={"12%"}
                     onClick={() => handleInputTranslate(index)}
-                    style={{ alignSelf: "flex-end" }}>
+                    style={{ alignSelf: "flex-start" }}>
                     {isLoading && (
                       <div>
                         <ClipLoader color={"red"} />
