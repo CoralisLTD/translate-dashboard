@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 
 const InputContainer = styled.div(() => ({
   flex: 1,
+  display: "flex",
+  flexDirection: "row"
 }));
 
 const Error = styled.div(({ theme }) => ({
@@ -16,15 +18,8 @@ const StyledDiv = styled.div(
   ({ error, theme, height, isActive, transparentBorder, disabled }) => ({
     backgroundColor: disabled ? theme.color.gray : theme.color.white,
     height: height ? height : "3em",
-    border: transparentBorder
-      ? "none"
-      : `1px solid ${
-          !!error === true
-            ? theme.color.error
-            : isActive
-            ? theme.color.text
-            : theme.color.stroke
-        }`,
+    width: "100%",
+    margin: "0 15px",
     borderRadius: 6,
     fontSize: 16,
     display: "flex",
@@ -79,6 +74,7 @@ const Label = styled.div(({ theme, isRtl }) => ({
   color: theme.color.text,
   textAlign: isRtl ? "right" : "left",
   fontWeight: 400,
+  width: 440,
   marginBottom: 10,
 }));
 
@@ -95,6 +91,7 @@ const Input = ({
   disabled = false,
   innerRef,
   error,
+  direction,
   ...props
 }) => {
   const { i18n } = useTranslation();
@@ -131,8 +128,8 @@ const Input = ({
         )}
         <StyledInput
           ref={innerRef}
-          dir={i18n.dir()}
-          placeholder={placeholder || label}
+          dir={direction}
+          placeholder={placeholder}
           disabled={disabled}
           {...props}
           style={{ ...props.style, marginBottom: 0 }}
