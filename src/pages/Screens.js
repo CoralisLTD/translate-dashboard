@@ -5,6 +5,7 @@ import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
 import { reverseText, stripHtmlAndSpecialChars } from "../utils/text";
 import { useNavigate } from "react-router-dom";
+import { TextArea } from "../UI/src/Input";
 
 const Title = styled.div(() => ({
   fontSize: 30
@@ -137,28 +138,53 @@ const Screens = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                  <Input
-                    label={cleanText}
-                    direction={lang === 2 ? "ltr" : "rtl"}
-                    value={
-                      (translation && translation[index]?.data) ||
-                      translationValue
-                    }
-                    type="text"
-                    onChange={(e) => {
-                      translate({
-                        index: index,
-                        EXEC: item.EXEC,
-                        NUM: item.NUM,
-                        value: e.target.value
-                      });
-                      setIsUpdate(!!translationValue);
-                    }}
-                  />
+                  {cleanText.length <= 150 ? (
+                    <Input
+                      label={cleanText}
+                      direction={lang === 2 ? "ltr" : "rtl"}
+                      value={
+                        (translation && translation[index]?.data) ||
+                        translationValue
+                      }
+                      type="text"
+                      onChange={(e) => {
+                        translate({
+                          index: index,
+                          EXEC: item.EXEC,
+                          NUM: item.NUM,
+                          value: e.target.value
+                        });
+                        setIsUpdate(!!translationValue);
+                      }}
+                    />
+                  ) : (
+                    <TextArea
+                      label={cleanText}
+                      rows={Math.ceil(cleanText.length / 80)}
+                      direction={lang === 2 ? "ltr" : "rtl"}
+                      value={
+                        (translation && translation[index]?.data) ||
+                        translationValue
+                      }
+                      style={{
+                        height: "100%",
+                        textAlign: lang === 2 ? "end" : "start"
+                      }}
+                      onChange={(e) => {
+                        translate({
+                          index: index,
+                          EXEC: item.EXEC,
+                          NUM: item.NUM,
+                          value: e.target.value
+                        });
+                        setIsUpdate(!!translationValue);
+                      }}
+                    />
+                  )}
                   <Button
                     width={"12%"}
                     onClick={() => handleInputTranslate(index)}
-                    style={{ alignSelf: "flex-end" }}>
+                    style={{ alignSelf: "flex-start" }}>
                     {isLoading && (
                       <div>
                         <ClipLoader color={"red"} />

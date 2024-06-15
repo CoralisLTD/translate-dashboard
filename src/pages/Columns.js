@@ -5,6 +5,7 @@ import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
 import { stripHtmlAndSpecialChars } from "../utils/text";
 import { useNavigate } from "react-router-dom";
+import { TextArea } from "../UI/src/Input";
 
 const Title = styled.div(() => ({
   fontSize: 30
@@ -45,7 +46,7 @@ const Columns = ({ translateStore }) => {
       const data = await translateStore.get_TRHELPFORM();
       const list = data?.filter((item) => {
         let cleanText = stripHtmlAndSpecialChars(
-          item?.TRFORMCLMNHELP_SUBFORM.TEXT
+          item?.TRFORMCLMNHELP_SUBFORM?.TEXT
         );
         if (!cleanText) return false;
         return true;
@@ -114,19 +115,19 @@ const Columns = ({ translateStore }) => {
           <ul style={{ padding: 0 }}>
             {items?.map((item, index) => {
               let cleanText = stripHtmlAndSpecialChars(
-                item?.TRFORMCLMNHELP_SUBFORM.TEXT
+                item?.TRFORMCLMNHELP_SUBFORM?.TEXT
               );
               // if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {
               //   cleanText =
               //     cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
               // }
-              let translationValue = item.LANGEXTMSG_SUBFORM.find(
+              let translationValue = !!item?.TRLANGS2_SUBFORM.length && item?.TRLANGS2_SUBFORM[0]?.find(
                 (it) => it.LANG === 2
               )?.MESSAGE;
-              if (item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT) {
+              if (item?.TRLANGS2_SUBFORM[0]?.LANGFORMCLMNHELP2_SUBFORM?.TEXT) {
                 translationValue =
                   translationValue +
-                  item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT;
+                  item?.TRLANGS2_SUBFORM[0]?.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
               }
               return (
                 <li
@@ -138,7 +139,7 @@ const Columns = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                  <Input
+                  {cleanText.length <= 150 ? (<Input
                     label={cleanText}
                     direction={lang === 2 ? "ltr" : "rtl"}
                     value={
@@ -154,11 +155,30 @@ const Columns = ({ translateStore }) => {
                         value: e.target.value
                       });
                     }}
-                  />
+                  />) : (
+                    <TextArea
+                      label={cleanText}
+                      rows={Math.ceil(cleanText.length / 80)}
+                      direction={lang === 2 ? "ltr" : "rtl"}
+                      value={
+                        (translation && translation[index]?.data) ||
+                        translationValue
+                      }
+                      style={{ height: "100%", textAlign: lang === 2 ? "end" : "start" }}
+                      onChange={(e) => {
+                        translate({
+                          index: index,
+                          EXEC: item.EXEC,
+                          NUM: item.NUM,
+                          value: e.target.value
+                        });
+                      }}
+                    />
+                  )}
                   <Button
                     width={"12%"}
                     onClick={() => handleInputTranslate(index)}
-                    style={{ alignSelf: "flex-end" }}>
+                    style={{ alignSelf: "flex-start" }}>
                     {isLoading && (
                       <div>
                         <ClipLoader color={"red"} />

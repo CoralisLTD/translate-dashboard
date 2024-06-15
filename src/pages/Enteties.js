@@ -5,6 +5,7 @@ import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
 import { reverseText, getCleanText } from "../utils/text";
 import { useNavigate } from "react-router-dom";
+import { TextArea } from "../UI/src/Input";
 
 const Title = styled.div(() => ({
   fontSize: 30
@@ -117,7 +118,7 @@ const Screens = ({ translateStore }) => {
                 cleanText =
                   cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
               }
-              let translationValue = item.TRLANGS_SUBFORM.find(
+              let translationValue = item.TRLANGS_SUBFORM?.find(
                 (it) => it.LANG === 2
               )?.LANGHELP2_SUBFORM?.TEXT;
               translationValue = getCleanText(translationValue);
@@ -136,23 +137,47 @@ const Screens = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                  <Input
-                    label={cleanText}
-                    direction={lang === 2 ? "ltr" : "rtl"}
-                    value={
-                      (translation && translation[index]?.data) ||
-                      translationValue
-                    }
-                    type="text"
-                    onChange={(e) => {
-                      translate({
-                        index: index,
-                        ENAME: item.ENAME,
-                        TYPE: item.TYPE,
-                        value: e.target.value
-                      });
-                    }}
-                  />
+                  {cleanText.length <= 150 ? (
+                    <Input
+                      label={cleanText}
+                      direction={lang === 2 ? "ltr" : "rtl"}
+                      value={
+                        (translation && translation[index]?.data) ||
+                        translationValue
+                      }
+                      type="text"
+                      onChange={(e) => {
+                        translate({
+                          index: index,
+                          ENAME: item.ENAME,
+                          TYPE: item.TYPE,
+                          value: e.target.value
+                        });
+                      }}
+                    />
+                  ) : (
+                    <TextArea
+                      label={cleanText}
+                      rows={Math.ceil(cleanText.length / 80)}
+                      direction={lang === 2 ? "ltr" : "rtl"}
+                      value={
+                        (translation && translation[index]?.data) ||
+                        translationValue
+                      }
+                      style={{
+                        height: "100%",
+                        textAlign: lang === 2 ? "end" : "start"
+                      }}
+                      onChange={(e) => {
+                        translate({
+                          index: index,
+                          EXEC: item.EXEC,
+                          NUM: item.NUM,
+                          value: e.target.value
+                        });
+                      }}
+                    />
+                  )}
                   <Button
                     width={"12%"}
                     onClick={() => handleInputTranslate(index)}

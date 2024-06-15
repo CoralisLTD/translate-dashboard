@@ -11,25 +11,23 @@ const InputContainer = styled.div(() => ({
 const Error = styled.div(({ theme }) => ({
   fontSize: 12,
   color: theme.color.error,
-  marginTop: "0.5em",
+  marginTop: "0.5em"
 }));
 
-const StyledDiv = styled.div(
-  ({ error, theme, height, isActive, transparentBorder, disabled }) => ({
-    backgroundColor: disabled ? theme.color.gray : theme.color.white,
-    height: height ? height : "3em",
-    width: "100%",
-    margin: "0 15px",
-    borderRadius: 6,
-    fontSize: 16,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingInlineEnd: "12px",
-    paddingInlineStart: "10px",
-    lineHeight: 1,
-  })
-);
+const StyledDiv = styled.div(({ theme, height, disabled }) => ({
+  backgroundColor: disabled ? theme.color.gray : theme.color.white,
+  height: height ? height : "3em",
+  width: "100%",
+  margin: "0 15px",
+  borderRadius: 6,
+  fontSize: 16,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingInlineEnd: "12px",
+  paddingInlineStart: "10px",
+  lineHeight: 1
+}));
 
 const StyleEndImg = styled.img(({ ...props }) => ({
   marginInlineStart: "auto",
@@ -38,7 +36,7 @@ const StyleEndImg = styled.img(({ ...props }) => ({
   alignSelf: "center",
   filter: props.disabled ? "grayscale(1)" : "unset",
   pointerEvents: props.disabled ? "none" : "unset",
-  cursor: "pointer",
+  cursor: "pointer"
 }));
 
 const StyleStartImg = styled.img(({ ...props }) => ({
@@ -47,7 +45,7 @@ const StyleStartImg = styled.img(({ ...props }) => ({
   marginInlineEnd: "1em",
   alignSelf: "center",
   filter: props.disabled ? "grayscale(1)" : "unset",
-  pointerEvents: props.disabled ? "none" : "unset",
+  pointerEvents: props.disabled ? "none" : "unset"
 }));
 
 const StyledInput = styled.input(({ theme, disabled }) => ({
@@ -60,13 +58,13 @@ const StyledInput = styled.input(({ theme, disabled }) => ({
   border: "none",
   outline: "none",
   "::placeholder": {
-    color: theme.color.text,
+    color: theme.color.text
   },
   lineHeight: 1,
   "&:focus": {
-    outline: "none",
+    outline: "none"
   },
-  textAlign: "start",
+  textAlign: "start"
 }));
 
 const Label = styled.div(({ theme, isRtl }) => ({
@@ -75,7 +73,7 @@ const Label = styled.div(({ theme, isRtl }) => ({
   textAlign: isRtl ? "right" : "left",
   fontWeight: 400,
   width: 440,
-  marginBottom: 10,
+  marginBottom: 10
 }));
 
 const Input = ({
@@ -104,8 +102,7 @@ const Input = ({
         error={!!helperText || error}
         height={props.style?.height}
         isActive={isActive}
-        disabled={disabled}
-      >
+        disabled={disabled}>
         {!!startImg && (
           <StyleStartImg
             disabled={disabled}
@@ -122,9 +119,8 @@ const Input = ({
               height: 20,
               lineHeight: "28px",
               marginInlineEnd: 10,
-              border: color === "white" ? "1px solid #dcdcdc" : "",
-            }}
-          ></div>
+              border: color === "white" ? "1px solid #dcdcdc" : ""
+            }}></div>
         )}
         <StyledInput
           ref={innerRef}
