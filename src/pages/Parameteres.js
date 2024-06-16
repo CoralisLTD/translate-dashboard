@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
@@ -61,6 +61,7 @@ const Parameters = ({ translateStore }) => {
       setTranslation({
         [params.index]: {
           PROG: params.PROG,
+          KANG: params.PROG,
           NAME: params.NAME,
           data: params.value
         }
@@ -71,14 +72,14 @@ const Parameters = ({ translateStore }) => {
   const handleInputTranslate = async (index) => {
     const body = {
       data: {
-        MESSAGE: translation[index]?.data.substring(0, 55),
-        LANGEXTMSGTEXT_SUBFORM: {
-          TEXT: translation[index]?.data.substring(55)
+        LANGFORMCLMNHELP2_SUBFORM: {
+          TEXT: translation[index]?.data
         },
         LANG: lang
       },
+      NAME: translation[index].NAME,
       PROG: translation[index].PROG,
-      NAME: translation[index].NAME
+      GLANG: "en-GB"
     };
     setLoading(true);
     const res = await translateStore.update_TRHELPPROGRAM(body);
@@ -87,6 +88,7 @@ const Parameters = ({ translateStore }) => {
       console.log("data is saved");
     }
   };
+  const memoizeditems = useMemo(() => items, [items]);
 
   return (
     <List>
@@ -111,20 +113,12 @@ const Parameters = ({ translateStore }) => {
             <Title>תרגום עזרות פרמטרים לפרוצדורה</Title>
           </div>
           <ul style={{ padding: 0 }}>
-            {items?.map((item, index) => {
+            {memoizeditems?.map((item, index) => {
               let cleanText = getCleanText(item?.TRFORMCLMNHELP_SUBFORM?.TEXT);
-              // if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {
-              //   cleanText =
-              //     cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
-              // }
               let translationValue = item.TRLANGS2_SUBFORM.find(
                 (it) => it.LANG === 2
-              )?.MESSAGE;
-              if (item.TRLANGS2_SUBFORM[0]?.LANGFORMCLMNHELP2_SUBFORM?.TEXT) {
-                translationValue =
-                  translationValue +
-                  item.TRLANGS2_SUBFORM[0]?.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
-              }
+              )?.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
+
               return (
                 <li
                   key={index}
@@ -135,37 +129,42 @@ const Parameters = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                   {cleanText.length <= 150 ? (<Input
-                    label={cleanText}
-                    direction={lang === 2 ? "ltr" : "rtl"}
-                    value={
-                      (translation && translation[index]?.data) ||
-                      translationValue
-                    }
-                    type="text"
-                    onChange={(e) => {
-                      translate({
-                        index: index,
-                        PROG: item.PROG,
-                        NAME: item.NAME,
-                        value: e.target.value
-                      });
-                    }}
-                  />) : (
+                  {cleanText.length <= 150 ? (
+                    <Input
+                      label={cleanText}
+                      direction={lang === 2 ? "ltr" : "rtl"}
+                      value={
+                        getCleanText(translation && translation[index]?.data) ||
+                        getCleanText(translationValue)
+                      }
+                      type="text"
+                      onChange={(e) => {
+                        translate({
+                          index: index,
+                          PROG: item.PROG,
+                          NAME: item.NAME,
+                          value: e.target.value
+                        });
+                      }}
+                    />
+                  ) : (
                     <TextArea
                       label={cleanText}
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        (translation && translation[index]?.data) ||
-                        translationValue
+                        (getCleanText(translation && translation[index]?.data)) ||
+                        getCleanText(translationValue)
                       }
-                      style={{ height: "100%", textAlign: lang === 2 ? "end" : "start" }}
+                      style={{
+                        height: "100%",
+                        textAlign: lang === 2 ? "end" : "start"
+                      }}
                       onChange={(e) => {
                         translate({
                           index: index,
-                          EXEC: item.EXEC,
-                          NUM: item.NUM,
+                          PROG: item.PROG,
+                          NAME: item.NAME,
                           value: e.target.value
                         });
                       }}

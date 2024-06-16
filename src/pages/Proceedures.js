@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
@@ -94,6 +94,7 @@ const Proceedures = ({ translateStore }) => {
       console.log("data is saved");
     }
   };
+  const memoizeditems = useMemo(() => items, [items]);
 
   return (
     <List>
@@ -130,7 +131,7 @@ const Proceedures = ({ translateStore }) => {
             </Button> */}
           </div>
           <ul style={{ padding: 0 }}>
-            {items?.map((item, index) => {
+            {memoizeditems?.map((item, index) => {
               let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
               if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {
                 cleanText =

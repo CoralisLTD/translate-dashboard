@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
-import { stripHtmlAndSpecialChars } from "../utils/text";
+import { getCleanText, stripHtmlAndSpecialChars } from "../utils/text";
 import { useNavigate } from "react-router-dom";
 import { TextArea } from "../UI/src/Input";
 
@@ -38,12 +38,14 @@ const Columns = ({ translateStore }) => {
   // eslint-disable-next-line no-unused-vars
   const [lang, setLang] = useState(2);
   const [translation, setTranslation] = useState(null);
+  const [top, setTop] = useState(50);
+  const [skip, setSkip] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const data = await translateStore.get_TRHELPFORM();
+      const data = await translateStore.get_TRHELPFORM({ top, skip });
       const list = data?.filter((item) => {
         let cleanText = stripHtmlAndSpecialChars(
           item?.TRFORMCLMNHELP_SUBFORM?.TEXT
@@ -56,7 +58,7 @@ const Columns = ({ translateStore }) => {
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [top, skip]);
 
   const translate = (params) => {
     if (params.value) {
@@ -70,17 +72,27 @@ const Columns = ({ translateStore }) => {
     }
   };
 
+  const handleNextPage = () => {
+    setTop(top + 50);
+    setSkip(skip + 50);
+  };
+
+  const handlePrevPage = () => {
+    setTop(top - 50);
+    setSkip(skip - 50);
+  };
+
   const handleInputTranslate = async (index) => {
     const body = {
       data: {
-        MESSAGE: translation[index]?.data.substring(0, 55),
-        LANGEXTMSGTEXT_SUBFORM: {
-          TEXT: translation[index]?.data.substring(55)
+        LANGFORMCLMNHELP2_SUBFORM: {
+          TEXT: translation[index]?.data
         },
         LANG: lang
       },
       NAME: translation[index].NAME,
-      FORM: translation[index].FORM
+      FORM: translation[index].FORM,
+      GLANG: "en-GB"
     };
     setLoading(true);
     const res = await translateStore.update_TRHELPFORM(body);
@@ -89,6 +101,7 @@ const Columns = ({ translateStore }) => {
       console.log("data is saved");
     }
   };
+  const memoizeditems = useMemo(() => items, [items]);
 
   return (
     <List>
@@ -113,22 +126,13 @@ const Columns = ({ translateStore }) => {
             <Title>תרגום עזרות לעמודות מסך</Title>
           </div>
           <ul style={{ padding: 0 }}>
-            {items?.map((item, index) => {
-              let cleanText = stripHtmlAndSpecialChars(
-                item?.TRFORMCLMNHELP_SUBFORM?.TEXT
-              );
-              // if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {
-              //   cleanText =
-              //     cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
-              // }
-              let translationValue = !!item?.TRLANGS2_SUBFORM.length && item?.TRLANGS2_SUBFORM[0]?.find(
-                (it) => it.LANG === 2
-              )?.MESSAGE;
-              if (item?.TRLANGS2_SUBFORM[0]?.LANGFORMCLMNHELP2_SUBFORM?.TEXT) {
-                translationValue =
-                  translationValue +
-                  item?.TRLANGS2_SUBFORM[0]?.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
-              }
+            {memoizeditems?.map((item, index) => {
+              let cleanText = getCleanText(item?.TRFORMCLMNHELP_SUBFORM?.TEXT);
+              let translationValue =
+                !!item?.TRLANGS2_SUBFORM.length &&
+                item?.TRLANGS2_SUBFORM?.find((it) => it.LANG === 2)
+                  ?.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
+
               return (
                 <li
                   key={index}
@@ -139,32 +143,37 @@ const Columns = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                  {cleanText.length <= 150 ? (<Input
-                    label={cleanText}
-                    direction={lang === 2 ? "ltr" : "rtl"}
-                    value={
-                      (translation && translation[index]?.data) ||
-                      translationValue
-                    }
-                    type="text"
-                    onChange={(e) => {
-                      translate({
-                        index: index,
-                        FORM: item.FORM,
-                        NAME: item.NAME,
-                        value: e.target.value
-                      });
-                    }}
-                  />) : (
+                  {cleanText.length <= 150 ? (
+                    <Input
+                      label={cleanText}
+                      direction={lang === 2 ? "ltr" : "rtl"}
+                      value={
+                        getCleanText(translation && translation[index]?.data) ||
+                        getCleanText(translationValue)
+                      }
+                      type="text"
+                      onChange={(e) => {
+                        translate({
+                          index: index,
+                          FORM: item.FORM,
+                          NAME: item.NAME,
+                          value: e.target.value
+                        });
+                      }}
+                    />
+                  ) : (
                     <TextArea
                       label={cleanText}
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        (translation && translation[index]?.data) ||
-                        translationValue
+                        getCleanText(translation && translation[index]?.data) ||
+                        getCleanText(translationValue)
                       }
-                      style={{ height: "100%", textAlign: lang === 2 ? "end" : "start" }}
+                      style={{
+                        height: "100%",
+                        textAlign: lang === 2 ? "end" : "start"
+                      }}
                       onChange={(e) => {
                         translate({
                           index: index,
@@ -190,6 +199,10 @@ const Columns = ({ translateStore }) => {
               );
             })}
           </ul>
+          <button onClick={handlePrevPage} disabled={top === 50}>
+            Previous
+          </button>
+          <button onClick={handleNextPage}>Next</button>
         </>
       )}
     </List>
