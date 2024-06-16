@@ -61,16 +61,23 @@ const Proceedures = ({ translateStore }) => {
   //   setLang(lang);
   // };
 
+  // useEffect(() => {
+  //   const delayDebounceFn = setTimeout(() => {
+  //     setValue()
+  //   }, 3000)
+
+  //   return () => clearTimeout(delayDebounceFn)
+  // }, [translation]);
+
   const translate = (params) => {
-    if (params.value) {
-      setTranslation({
-        [params.index]: {
-          EXEC: params.EXEC,
-          NUM: params.NUM,
-          data: params.value
-        }
-      });
-    }
+    console.log(params.value);
+    setTranslation({
+      [params.index]: {
+        EXEC: params.EXEC,
+        NUM: params.NUM,
+        data: params.value || ""
+      }
+    });
   };
 
   const handleInputTranslate = async (index) => {
@@ -83,17 +90,20 @@ const Proceedures = ({ translateStore }) => {
         LANG: lang
       },
       EXEC: translation[index].EXEC,
-      NUM: translation[index].NUM
+      NUM: translation[index].NUM,
+      LANG: lang
     };
     setLoading(true);
     const res = isUpdate
       ? await translateStore.update_TREXTMSG(body)
       : await translateStore.add_TREXTMSG(body);
+
     setLoading(false);
     if (res?.isSucceed) {
       console.log("data is saved");
     }
   };
+
   const memoizeditems = useMemo(() => items, [items]);
 
   return (
@@ -183,7 +193,10 @@ const Proceedures = ({ translateStore }) => {
                         (translation && translation[index]?.data) ||
                         translationValue
                       }
-                      style={{ height: "100%", textAlign: lang === 2 ? "end" : "start" }}
+                      style={{
+                        height: "100%",
+                        textAlign: lang === 2 ? "end" : "start"
+                      }}
                       onChange={(e) => {
                         translate({
                           index: index,

@@ -73,7 +73,7 @@ const Screens = ({ translateStore }) => {
     const body = {
       data: {
         MESSAGE: translation[index]?.data.substring(0, 55),
-        LANGEXTMSGTEXT_SUBFORM: {
+        LANGTRIGMSGTEXT_SUBFORM: {
           TEXT: translation[index]?.data.substring(55)
         },
         LANG: lang

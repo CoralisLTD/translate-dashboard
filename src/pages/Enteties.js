@@ -71,14 +71,12 @@ const Screens = ({ translateStore }) => {
   const handleInputTranslate = async (index) => {
     const body = {
       data: {
-        MESSAGE: translation[index]?.data.substring(0, 55),
-        LANGEXTMSGTEXT_SUBFORM: {
-          TEXT: translation[index]?.data.substring(55)
+        LANGHELP2_SUBFORM: {
+          TEXT: translation[index]?.data
         }
       },
       ENAME: translation[index].ENAME,
       TYPE: translation[index].TYPE,
-      LANG: lang,
       GLANG: "en-GB"
     };
     setLoading(true);
