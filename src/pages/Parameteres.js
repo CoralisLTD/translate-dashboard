@@ -133,10 +133,11 @@ const Parameters = ({ translateStore }) => {
                     <Input
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
-                      value={
-                        getCleanText(translation && translation[index]?.data) ||
-                        getCleanText(translationValue)
-                      }
+                      value={getCleanText(
+                        translation
+                          ? translation[index]?.data
+                          : translationValue
+                      )}
                       type="text"
                       onChange={(e) => {
                         translate({
@@ -152,10 +153,11 @@ const Parameters = ({ translateStore }) => {
                       label={cleanText}
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
-                      value={
-                        getCleanText(translation && translation[index]?.data) ||
-                        getCleanText(translationValue)
-                      }
+                      value={getCleanText(
+                        translation
+                          ? translation[index]?.data
+                          : translationValue
+                      )}
                       style={{
                         height: "100%",
                         textAlign: lang === 2 ? "end" : "start"

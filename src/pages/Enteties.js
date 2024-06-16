@@ -121,11 +121,6 @@ const Screens = ({ translateStore }) => {
                 (it) => it.LANG === 2
               )?.LANGHELP2_SUBFORM?.TEXT;
               translationValue = getCleanText(translationValue);
-              // if (item.TRLANGS_SUBFORM[0]?.LANGHELP2_SUBFORM?.TEXT) {
-              //   translationValue =
-              //     translationValue +
-              //     item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT;
-              // }
               return (
                 <li
                   key={index}
@@ -141,8 +136,9 @@ const Screens = ({ translateStore }) => {
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        (translation && translation[index]?.data) ||
-                        translationValue
+                        translation
+                          ? translation[index]?.data
+                          : translationValue
                       }
                       type="text"
                       onChange={(e) => {
@@ -160,8 +156,9 @@ const Screens = ({ translateStore }) => {
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        (translation && translation[index]?.data) ||
-                        translationValue
+                        translation
+                        ? translation[index]?.data
+                        : translationValue
                       }
                       style={{
                         height: "100%",
