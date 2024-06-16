@@ -61,15 +61,15 @@ const Columns = ({ translateStore }) => {
   }, [top, skip]);
 
   const translate = (params) => {
-    if (params.value) {
-      setTranslation({
-        [params.index]: {
-          FORM: params.FORM,
-          NAME: params.NAME,
-          data: params.value
-        }
-      });
-    }
+    const updatedTranslation = {
+      ...translation,
+      [params.index]: {
+        FORM: params.FORM,
+        NAME: params.NAME,
+        data: params.value || ""
+      }
+    };
+    setTranslation(updatedTranslation);
   };
 
   const handleNextPage = () => {

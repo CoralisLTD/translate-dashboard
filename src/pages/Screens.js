@@ -58,15 +58,15 @@ const Screens = ({ translateStore }) => {
   }, []);
 
   const translate = (params) => {
-    if (params.value) {
-      setTranslation({
-        [params.index]: {
-          EXEC: params.EXEC,
-          NUM: params.NUM,
-          data: params.value
-        }
-      });
-    }
+    const updatedTranslation = {
+      ...translation,
+      [params.index]: {
+        EXEC: params.EXEC,
+        NUM: params.NUM,
+        data: params.value || ""
+      }
+    };
+    setTranslation(updatedTranslation);
   };
 
   const handleInputTranslate = async (index) => {

@@ -70,14 +70,15 @@ const Proceedures = ({ translateStore }) => {
   // }, [translation]);
 
   const translate = (params) => {
-    console.log(params.value);
-    setTranslation({
+    const updatedTranslation = {
+      ...translation,
       [params.index]: {
         EXEC: params.EXEC,
         NUM: params.NUM,
         data: params.value || ""
       }
-    });
+    };
+    setTranslation(updatedTranslation);
   };
 
   const handleInputTranslate = async (index) => {
@@ -150,6 +151,7 @@ const Proceedures = ({ translateStore }) => {
               let translationValue = item.LANGEXTMSG_SUBFORM.find(
                 (it) => it.LANG === 2
               )?.MESSAGE;
+
               if (item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT) {
                 translationValue =
                   translationValue +
@@ -170,8 +172,9 @@ const Proceedures = ({ translateStore }) => {
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        (translation && translation[index]?.data) ||
-                        translationValue
+                        translation
+                          ? translation[index]?.data
+                          : translationValue
                       }
                       type="text"
                       onChange={(e) => {
@@ -190,8 +193,9 @@ const Proceedures = ({ translateStore }) => {
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        (translation && translation[index]?.data) ||
-                        translationValue
+                        translation
+                          ? translation[index]?.data
+                          : translationValue
                       }
                       style={{
                         height: "100%",

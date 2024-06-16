@@ -57,16 +57,16 @@ const Parameters = ({ translateStore }) => {
   }, []);
 
   const translate = (params) => {
-    if (params.value) {
-      setTranslation({
-        [params.index]: {
-          PROG: params.PROG,
-          KANG: params.PROG,
-          NAME: params.NAME,
-          data: params.value
-        }
-      });
-    }
+    const updatedTranslation = {
+      ...translation,
+      [params.index]: {
+        PROG: params.PROG,
+        KANG: params.PROG,
+        NAME: params.NAME,
+        data: params.value || ""
+      }
+    };
+    setTranslation(updatedTranslation);
   };
 
   const handleInputTranslate = async (index) => {
@@ -153,7 +153,7 @@ const Parameters = ({ translateStore }) => {
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        (getCleanText(translation && translation[index]?.data)) ||
+                        getCleanText(translation && translation[index]?.data) ||
                         getCleanText(translationValue)
                       }
                       style={{
