@@ -1,8 +1,11 @@
 import React from "react";
-import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import styled from "styled-components";
 
-const InputContainer = styled.div(() => ({
+const InputContainer = styled.div(({ theme }) => ({
+  // flex: 1,
+  // marginLeft: "0.5em",
+  // marginRight: "0.5em",
   flex: 1,
   display: "flex",
   flexDirection: "row"
@@ -33,22 +36,16 @@ const StyleEndImg = styled.img(({ ...props }) => ({
   marginInlineStart: "auto",
   width: 20,
   height: 20,
-  alignSelf: "center",
-  filter: props.disabled ? "grayscale(1)" : "unset",
-  pointerEvents: props.disabled ? "none" : "unset",
-  cursor: "pointer"
+  alignSelf: "self-start"
 }));
 
 const StyleStartImg = styled.img(({ ...props }) => ({
   width: 22,
   height: 22,
-  marginInlineEnd: "1em",
-  alignSelf: "center",
-  filter: props.disabled ? "grayscale(1)" : "unset",
-  pointerEvents: props.disabled ? "none" : "unset"
+  marginInlineEnd: "1em"
 }));
 
-const StyledInput = styled.input(({ theme, disabled }) => ({
+const StyledInput = styled.textarea(({ theme, disabled, ...props }) => ({
   fontFamily: "Assistant",
   fontSize: 18,
   fontWeight: "400",
@@ -56,27 +53,29 @@ const StyledInput = styled.input(({ theme, disabled }) => ({
   pointerEvents: disabled ? "none" : "unset",
   backgroundColor: "transparent",
   border: "none",
+  padding: "13px 0",
   outline: "none",
+  resize: "none",
   "::placeholder": {
     color: theme.color.text
   },
-  lineHeight: 1,
+  lineHeight: "20px",
   "&:focus": {
     outline: "none"
   },
   textAlign: "start"
 }));
 
-const Label = styled.div(({ theme, isRtl }) => ({
+const Label = styled.div(({ theme }) => ({
   fontSize: 16,
   color: theme.color.text,
-  textAlign: isRtl ? "right" : "left",
+  textAlign: "right",
   fontWeight: 400,
   width: 440,
   marginBottom: 10
 }));
 
-const Input = ({
+const TextArea = ({
   label,
   placeholder,
   endImg,
@@ -85,11 +84,7 @@ const Input = ({
   onEndImgClick,
   isActive,
   transparentBorder,
-  color,
   disabled = false,
-  innerRef,
-  error,
-  direction,
   ...props
 }) => {
   const { i18n } = useTranslation();
@@ -98,50 +93,24 @@ const Input = ({
     <InputContainer style={{ ...props.style }}>
       {!!label && <Label isRtl={isRtl}>{label}</Label>}
       <StyledDiv
-        transparentBorder={transparentBorder}
-        error={!!helperText || error}
+        error={!!helperText}
         height={props.style?.height}
+        transparentBorder={transparentBorder}
         isActive={isActive}
         disabled={disabled}>
-        {!!startImg && (
-          <StyleStartImg
-            disabled={disabled}
-            src={startImg}
-            alt="input-start-img"
-          />
-        )}
-        {!!color && (
-          <div
-            style={{
-              borderRadius: 50,
-              backgroundColor: color,
-              width: 45,
-              height: 20,
-              lineHeight: "28px",
-              marginInlineEnd: 10,
-              border: color === "white" ? "1px solid #dcdcdc" : ""
-            }}></div>
-        )}
+        {!!startImg && <StyleStartImg src={startImg} alt="input-start-img" />}
         <StyledInput
-          ref={innerRef}
-          dir={direction}
+          dir={i18n.dir()}
           placeholder={placeholder}
-          disabled={disabled}
           {...props}
           style={{ ...props.style, marginBottom: 0 }}
         />
-        {!!endImg && (
-          <StyleEndImg
-            src={endImg}
-            disabled={disabled}
-            onClick={onEndImgClick}
-            alt="input-end-img"
-          />
-        )}
+        {!!endImg && <StyleEndImg src={endImg} alt="input-end-img" />}
       </StyledDiv>
+
       {!!helperText && <Error>{helperText}</Error>}
     </InputContainer>
   );
 };
 
-export default Input;
+export default TextArea;

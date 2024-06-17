@@ -54,7 +54,8 @@ const globalStyles = css`
     font-family: "Assistant";
     min-width: 100vw;
     min-height: 100vh;
-    scrollbar-color: "#ACBADB";
+    background-color: #E7ECF8;
+    scrollbar-color: #ACBADB;
 
     ::-webkit-scrollbar {
       width: 0;

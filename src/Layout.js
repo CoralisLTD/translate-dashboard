@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { observer, inject } from "mobx-react";
 import { useTranslation } from "react-i18next";
 import { styled } from "styled-components";
-import Header from "./components/Header";
+// import Header from "./components/Header";
 // import { Loading } from "../src/UI/src/Loading";
 // import MainMenu from "./pages/MainMenu";
 // import isMobile from "./UI/src/isMobile";
@@ -21,12 +21,12 @@ const LayoutContainer = styled("div")(({ theme }) => ({
   fontFamily: "Assistant"
 }));
 
-const Layout = ({ userStore, children }) => {
+const Layout = ({ children }) => {
   const { i18n } = useTranslation();
 
-  useEffect(() => {
-    i18n.changeLanguage(userStore.language);
-  }, [i18n, userStore.language]);
+  // useEffect(() => {
+  //   i18n.changeLanguage(userStore.language);
+  // }, [i18n, userStore.language]);
 
   const rtlOrLtr = i18n.dir();
 
@@ -37,10 +37,10 @@ const Layout = ({ userStore, children }) => {
 
   return (
     <LayoutContainer>
-      <Header />
+      {/* <Header /> */}
       {children}
     </LayoutContainer>
   );
 };
 
-export default inject("userStore")(observer(Layout));
+export default Layout;

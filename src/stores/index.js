@@ -1,9 +1,7 @@
 import translateStore from "./translateStore";
 
 const stores = {
-  translateStore,
-  projectsStore,
-  employeeStore,
+  translateStore
 };
 
 export default stores;
