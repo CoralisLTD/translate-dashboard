@@ -48,8 +48,6 @@ const Columns = ({ translateStore }) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      // const newTop = page * top;
-      // const newSkip = page * top - 50;
       const data = await translateStore.get_TRHELPFORM({ top, skip });
       const list = data?.filter((item) => {
         let cleanText = stripHtmlAndSpecialChars(
