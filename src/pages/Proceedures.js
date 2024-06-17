@@ -106,7 +106,7 @@ const Proceedures = ({ translateStore }) => {
   };
 
   const memoizeditems = useMemo(() => items, [items]);
-
+  
   return (
     <List>
       {isLoading ? (
@@ -172,7 +172,7 @@ const Proceedures = ({ translateStore }) => {
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        translation
+                        translation && translation[index]
                           ? translation[index]?.data
                           : translationValue
                       }
@@ -193,7 +193,7 @@ const Proceedures = ({ translateStore }) => {
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        translation
+                        translation && translation[index]
                           ? translation[index]?.data
                           : translationValue
                       }

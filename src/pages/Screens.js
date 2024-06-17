@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
@@ -90,6 +90,7 @@ const Screens = ({ translateStore }) => {
       console.log("data is saved");
     }
   };
+  const memoizeditems = useMemo(() => items, [items]);
 
   return (
     <List>
@@ -114,7 +115,7 @@ const Screens = ({ translateStore }) => {
             <Title>תרגום הודעות של מסכים</Title>
           </div>
           <ul style={{ padding: 0 }}>
-            {items?.map((item, index) => {
+            {memoizeditems?.map((item, index) => {
               let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
               if (item.TRTRIGMSGTEXT_SUBFORM?.TEXT) {
                 cleanText =
@@ -143,7 +144,7 @@ const Screens = ({ translateStore }) => {
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        translation
+                        translation && translation[index]
                           ? translation[index]?.data
                           : translationValue
                       }
@@ -160,11 +161,11 @@ const Screens = ({ translateStore }) => {
                     />
                   ) : (
                     <TextArea
-                      label={cleanText}
+                      label={`${cleanText} (${labelWordsCount} words)`}
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        translation
+                        translation && translation[index]
                           ? translation[index]?.data
                           : translationValue
                       }

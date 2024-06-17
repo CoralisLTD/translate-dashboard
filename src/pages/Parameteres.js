@@ -134,7 +134,7 @@ const Parameters = ({ translateStore }) => {
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={getCleanText(
-                        translation
+                        translation && translation[index]
                           ? translation[index]?.data
                           : translationValue
                       )}
@@ -154,7 +154,7 @@ const Parameters = ({ translateStore }) => {
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={getCleanText(
-                        translation
+                        translation && translation[index]
                           ? translation[index]?.data
                           : translationValue
                       )}

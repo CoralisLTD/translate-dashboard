@@ -87,7 +87,7 @@ const Screens = ({ translateStore }) => {
     }
   };
   const memoizeditems = useMemo(() => items, [items]);
-
+  
   return (
     <List>
       {isLoading ? (
@@ -136,7 +136,7 @@ const Screens = ({ translateStore }) => {
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        translation
+                        translation && translation[index]
                           ? translation[index]?.data
                           : translationValue
                       }
@@ -156,9 +156,9 @@ const Screens = ({ translateStore }) => {
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
-                        translation
-                        ? translation[index]?.data
-                        : translationValue
+                        translation && translation[index]
+                          ? translation[index]?.data
+                          : translationValue
                       }
                       style={{
                         height: "100%",
