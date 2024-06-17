@@ -125,6 +125,11 @@ const Columns = ({ translateStore }) => {
             </div>
             <Title>תרגום עזרות לעמודות מסך</Title>
           </div>
+          <p>עמוד מספר: {top / 50}</p>
+          <button onClick={handlePrevPage} disabled={top === 50}>
+            הקודם
+          </button>
+          <button onClick={handleNextPage}>הבא</button>
           <ul style={{ padding: 0 }}>
             {memoizeditems?.map((item, index) => {
               let cleanText = getCleanText(item?.TRFORMCLMNHELP_SUBFORM?.TEXT);
@@ -201,10 +206,6 @@ const Columns = ({ translateStore }) => {
               );
             })}
           </ul>
-          <button onClick={handlePrevPage} disabled={top === 50}>
-            Previous
-          </button>
-          <button onClick={handleNextPage}>Next</button>
         </>
       )}
     </List>
