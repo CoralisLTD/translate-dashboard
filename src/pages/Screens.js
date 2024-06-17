@@ -161,7 +161,7 @@ const Screens = ({ translateStore }) => {
                     />
                   ) : (
                     <TextArea
-                      label={`${cleanText} (${labelWordsCount} words)`}
+                      label={cleanText}
                       rows={Math.ceil(cleanText.length / 80)}
                       direction={lang === 2 ? "ltr" : "rtl"}
                       value={
