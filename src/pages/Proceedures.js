@@ -106,7 +106,7 @@ const Proceedures = ({ translateStore }) => {
   };
 
   const memoizeditems = useMemo(() => items, [items]);
-  
+
   return (
     <List>
       {isLoading ? (
@@ -142,6 +142,21 @@ const Proceedures = ({ translateStore }) => {
             </Button> */}
           </div>
           <ul style={{ padding: 0 }}>
+            <li>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  alignItems: "center",
+                  margin: "15px 0"
+                }}>
+                <span style={{ width: "342px", textAlign: "start" }}>
+                  ערך לתרגום
+                </span>
+                <span>התרגום</span>
+              </div>
+            </li>
             {memoizeditems?.map((item, index) => {
               let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
               if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {

@@ -113,6 +113,21 @@ const Parameters = ({ translateStore }) => {
             <Title>תרגום עזרות פרמטרים לפרוצדורה</Title>
           </div>
           <ul style={{ padding: 0 }}>
+          <li>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  alignItems: "center",
+                  margin: "15px 0"
+                }}>
+                <span style={{ width: "342px", textAlign: "start" }}>
+                  ערך לתרגום
+                </span>
+                <span>התרגום</span>
+              </div>
+            </li>
             {memoizeditems?.map((item, index) => {
               let cleanText = getCleanText(item?.TRFORMCLMNHELP_SUBFORM?.TEXT);
               let translationValue = item.TRLANGS2_SUBFORM.find(
