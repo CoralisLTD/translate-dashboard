@@ -4,7 +4,7 @@ import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
 import { getCleanText, stripHtmlAndSpecialChars } from "../utils/text";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { TextArea } from "../UI/src/Input";
 
 const Title = styled.div(() => ({
@@ -41,6 +41,9 @@ const Columns = ({ translateStore }) => {
   const [top, setTop] = useState(50);
   const [skip, setSkip] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const page = parseInt(searchParams.get("page")) || 1;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,6 +63,11 @@ const Columns = ({ translateStore }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [top, skip]);
 
+  useEffect(() => {
+    setTop(page * 50);
+    setSkip(page * 50 - 50);
+  }, [page]);
+
   const translate = (params) => {
     const updatedTranslation = {
       ...translation,
@@ -73,13 +81,11 @@ const Columns = ({ translateStore }) => {
   };
 
   const handleNextPage = () => {
-    setTop(top + 50);
-    setSkip(skip + 50);
+    navigate(`/columns?page=${page + 1}`);
   };
 
   const handlePrevPage = () => {
-    setTop(top - 50);
-    setSkip(skip - 50);
+    navigate(`/columns?page=${page - 1}`);
   };
 
   const handleInputTranslate = async (index) => {
@@ -125,19 +131,33 @@ const Columns = ({ translateStore }) => {
             </div>
             <Title>תרגום עזרות לעמודות מסך</Title>
           </div>
-          <p>עמוד מספר: {top / 50}</p>
-          <button onClick={handlePrevPage} disabled={top === 50}>
+          <button onClick={handlePrevPage} disabled={page === 1}>
             הקודם
           </button>
           <button onClick={handleNextPage}>הבא</button>
+          <p>עמוד מספר: {page}</p>
           <ul style={{ padding: 0 }}>
+            <li>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  alignItems: "center",
+                  margin: "15px 0"
+                }}>
+                <span style={{ width: "342px", textAlign: "start" }}>
+                  ערך לתרגום
+                </span>
+                <span>התרגום</span>
+              </div>
+            </li>
             {memoizeditems?.map((item, index) => {
               let cleanText = getCleanText(item?.TRFORMCLMNHELP_SUBFORM?.TEXT);
               let translationValue =
                 !!item?.TRLANGS2_SUBFORM.length &&
                 item?.TRLANGS2_SUBFORM?.find((it) => it.LANG === 2)
                   ?.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
-
               return (
                 <li
                   key={index}
@@ -148,7 +168,7 @@ const Columns = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                  {cleanText.length <= 150 ? (
+                  {cleanText.length <= 130 ? (
                     <Input
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}

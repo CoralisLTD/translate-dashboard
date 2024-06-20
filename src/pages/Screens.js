@@ -115,6 +115,21 @@ const Screens = ({ translateStore }) => {
             <Title>תרגום הודעות של מסכים</Title>
           </div>
           <ul style={{ padding: 0 }}>
+            <li>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  alignItems: "center",
+                  margin: "15px 0"
+                }}>
+                <span style={{ width: "342px", textAlign: "start" }}>
+                  ערך לתרגום
+                </span>
+                <span>התרגום</span>
+              </div>
+            </li>
             {memoizeditems?.map((item, index) => {
               let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
               if (item.TRTRIGMSGTEXT_SUBFORM?.TEXT) {
@@ -124,10 +139,11 @@ const Screens = ({ translateStore }) => {
               let translationValue = item.LANGTRIGMSG_SUBFORM.find(
                 (it) => it.LANG === 2
               )?.MESSAGE;
-              if (item.LANGTRIGMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT) {
+
+              if (item.LANGTRIGMSG_SUBFORM[0]?.LANGTRIGMSGTEXT_SUBFORM?.TEXT) {
                 translationValue =
                   translationValue +
-                  item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT;
+                  item.LANGTRIGMSG_SUBFORM[0]?.LANGTRIGMSGTEXT_SUBFORM?.TEXT;
               }
               return (
                 <li
@@ -139,7 +155,7 @@ const Screens = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                  {cleanText.length <= 150 ? (
+                  {cleanText.length <= 130 ? (
                     <Input
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
@@ -171,7 +187,7 @@ const Screens = ({ translateStore }) => {
                       }
                       style={{
                         height: "100%",
-                        textAlign: lang === 2 ? "end" : "start"
+                        textAlign: lang === 2 ? "start" : "end"
                       }}
                       onChange={(e) => {
                         translate({

@@ -47,7 +47,7 @@ const Home = () => {
           </Link>
         </Item>
         <Item>
-          <Link to="/columns">
+          <Link to="/columns?page=1">
             <div href="#">תרגום הודעות של מסכים</div>
           </Link>
         </Item>

@@ -1,11 +1,6 @@
 import { useEffect } from "react";
-import { observer, inject } from "mobx-react";
 import { useTranslation } from "react-i18next";
 import { styled } from "styled-components";
-// import Header from "./components/Header";
-// import { Loading } from "../src/UI/src/Loading";
-// import MainMenu from "./pages/MainMenu";
-// import isMobile from "./UI/src/isMobile";
 
 const LayoutContainer = styled("div")(({ theme }) => ({
   height: "100%",

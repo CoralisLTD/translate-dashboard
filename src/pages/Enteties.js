@@ -87,7 +87,7 @@ const Screens = ({ translateStore }) => {
     }
   };
   const memoizeditems = useMemo(() => items, [items]);
-  
+
   return (
     <List>
       {isLoading ? (
@@ -111,6 +111,21 @@ const Screens = ({ translateStore }) => {
             <Title>תרגום עזרות לישויות</Title>
           </div>
           <ul style={{ padding: 0 }}>
+            <li>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  alignItems: "center",
+                  margin: "15px 0"
+                }}>
+                <span style={{ width: "342px", textAlign: "start" }}>
+                  ערך לתרגום
+                </span>
+                <span>התרגום</span>
+              </div>
+            </li>
             {memoizeditems?.map((item, index) => {
               let cleanText = getCleanText(item?.TRHELP_SUBFORM?.TEXT);
               if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {
@@ -131,7 +146,7 @@ const Screens = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                  {cleanText.length <= 150 ? (
+                  {cleanText.length <= 130 ? (
                     <Input
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
@@ -162,7 +177,7 @@ const Screens = ({ translateStore }) => {
                       }
                       style={{
                         height: "100%",
-                        textAlign: lang === 2 ? "end" : "start"
+                        textAlign: lang === 2 ? "start" : "end"
                       }}
                       onChange={(e) => {
                         translate({

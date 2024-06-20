@@ -16,7 +16,7 @@ const AppRoutes = () => {
         <Route exact path="/screens" element={<Screens />} />
         <Route exact path="/parameters" element={<Parameteres />} />
         <Route exact path="/enteties" element={<Enteties />} />
-        <Route exact path="/columns" element={<Columns />} />
+        <Route exact path="/columns/:page?" element={<Columns />} />
         <Route exact path="/" element={<Home />} />
       </Routes>
       <Link to={"/proceedures"} style={{ display: "none" }}>
