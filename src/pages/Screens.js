@@ -139,10 +139,11 @@ const Screens = ({ translateStore }) => {
               let translationValue = item.LANGTRIGMSG_SUBFORM.find(
                 (it) => it.LANG === 2
               )?.MESSAGE;
-              if (item.LANGTRIGMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT) {
+
+              if (item.LANGTRIGMSG_SUBFORM[0]?.LANGTRIGMSGTEXT_SUBFORM?.TEXT) {
                 translationValue =
                   translationValue +
-                  item.LANGEXTMSG_SUBFORM[0]?.LANGEXTMSGTEXT_SUBFORM?.TEXT;
+                  item.LANGTRIGMSG_SUBFORM[0]?.LANGTRIGMSGTEXT_SUBFORM?.TEXT;
               }
               return (
                 <li
@@ -186,7 +187,7 @@ const Screens = ({ translateStore }) => {
                       }
                       style={{
                         height: "100%",
-                        textAlign: lang === 2 ? "end" : "start"
+                        textAlign: lang === 2 ? "start" : "end"
                       }}
                       onChange={(e) => {
                         translate({

@@ -175,7 +175,7 @@ const Parameters = ({ translateStore }) => {
                       )}
                       style={{
                         height: "100%",
-                        textAlign: lang === 2 ? "end" : "start"
+                        textAlign: lang === 2 ? "start" : "end"
                       }}
                       onChange={(e) => {
                         translate({

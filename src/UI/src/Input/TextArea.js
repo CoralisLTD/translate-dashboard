@@ -85,6 +85,7 @@ const TextArea = ({
   isActive,
   transparentBorder,
   disabled = false,
+  direction,
   ...props
 }) => {
   const { i18n } = useTranslation();
@@ -100,7 +101,7 @@ const TextArea = ({
         disabled={disabled}>
         {!!startImg && <StyleStartImg src={startImg} alt="input-start-img" />}
         <StyledInput
-          dir={i18n.dir()}
+          dir={direction}
           placeholder={placeholder}
           {...props}
           style={{ ...props.style, marginBottom: 0 }}

@@ -146,7 +146,7 @@ const Screens = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                  {cleanText.length <= 150 ? (
+                  {cleanText.length <= 130 ? (
                     <Input
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
@@ -177,7 +177,7 @@ const Screens = ({ translateStore }) => {
                       }
                       style={{
                         height: "100%",
-                        textAlign: lang === 2 ? "end" : "start"
+                        textAlign: lang === 2 ? "start" : "end"
                       }}
                       onChange={(e) => {
                         translate({
