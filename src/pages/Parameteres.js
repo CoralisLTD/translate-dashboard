@@ -144,7 +144,7 @@ const Parameters = ({ translateStore }) => {
                     alignItems: "center",
                     margin: "15px 0"
                   }}>
-                  {cleanText.length <= 150 ? (
+                  {cleanText.length <= 130 ? (
                     <Input
                       label={cleanText}
                       direction={lang === 2 ? "ltr" : "rtl"}
