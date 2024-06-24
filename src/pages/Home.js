@@ -38,17 +38,17 @@ const Home = () => {
         </Item>
         <Item>
           <Link to="/enteties">
-            <div href="#">תרגום הודעות של פרוצדורות</div>
+            <div href="#">תרגום עזרות לישויות</div>
           </Link>
         </Item>
         <Item>
           <Link to="/parameters">
-            <div href="#">תרגום הודעות של מסכים</div>
+            <div href="#">תרגום עזרות פרמטרים לפרוצדורה</div>
           </Link>
         </Item>
         <Item>
           <Link to="/columns?page=1">
-            <div href="#">תרגום הודעות של מסכים</div>
+            <div href="#">תרגום עזרות לעמודות מסך</div>
           </Link>
         </Item>
       </List>
