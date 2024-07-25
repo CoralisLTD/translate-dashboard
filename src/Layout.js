@@ -8,7 +8,7 @@ const LayoutContainer = styled("div")(({ theme }) => ({
   minHeight: "100vh",
   padding: 0,
   margin: 0,
-  background: "#E7ECF8",
+  background: "#f2f3f4",
   alignItems: "center",
   textAlign: "center",
   justifyContent: "center",

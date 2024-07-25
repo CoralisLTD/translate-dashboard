@@ -29,7 +29,8 @@ const StyledDiv = styled.div(({ theme, height, disabled }) => ({
   justifyContent: "center",
   paddingInlineEnd: "12px",
   paddingInlineStart: "10px",
-  lineHeight: 1
+  lineHeight: 1,
+  border: "1px solid #5382F6"
 }));
 
 const StyleEndImg = styled.img(({ ...props }) => ({

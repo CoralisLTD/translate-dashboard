@@ -4,7 +4,8 @@ import styled from "styled-components";
 const StyledButton = styled.button(
   ({ theme, width, disabled, active, height }) => ({
     color: theme.color.white,
-    height: height,
+    height: height || 48,
+    lineHeight: "8px",
     fontSize: 21.73,
     fontWeight: 400,
     letterSpacing: 0.1,
