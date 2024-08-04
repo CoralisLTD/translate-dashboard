@@ -49,13 +49,14 @@ const PaginationContainer = styled.div`
   }
 `;
 
-export const Pagination = ({ pageCount }) => {
+export const Pagination = ({ pageCount, pageName, currentPage }) => {
   const navigate = useNavigate();
 
   const handlePageChange = (event) => {
     const newPage = event.selected + 1;
-    navigate(`/columns?page=${newPage}`);
+    navigate(`${pageName}?page=${newPage}`);
   };
+
   return (
     <PaginationContainer>
       <ReactPaginate
@@ -71,6 +72,7 @@ export const Pagination = ({ pageCount }) => {
         subContainerClassName={"pages pagination"}
         activeClassName={"active"}
         disabledClassName={"disabled"}
+        forcePage={currentPage  - 1}
       />
     </PaginationContainer>
   );

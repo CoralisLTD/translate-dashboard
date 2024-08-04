@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
@@ -46,7 +46,6 @@ const Columns = ({ translateStore }) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const page = parseInt(searchParams.get("page")) || 1;
-  const memoizeditems = useMemo(() => items, [items]);
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -68,6 +67,7 @@ const Columns = ({ translateStore }) => {
   }, [top, skip]);
 
   useEffect(() => {
+    setTranslation(null);
     setTop(page * 50);
     setSkip(page * 50 - 50);
     setItemOffset((page - 1) * 10);
@@ -107,7 +107,7 @@ const Columns = ({ translateStore }) => {
   };
 
   const endOffset = itemOffset + itemsPerPage;
-  const currentItems = memoizeditems.slice(itemOffset, endOffset);
+  const currentItems = items.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(items.length / itemsPerPage);
 
   return (
@@ -125,7 +125,7 @@ const Columns = ({ translateStore }) => {
               style={{
                 display: "flex",
                 flexDirection: "row",
-                gap: "12px",
+                gap: "224px",
                 alignItems: "center"
               }}>
               <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
@@ -198,13 +198,13 @@ const Columns = ({ translateStore }) => {
                         )}
                         style={{
                           height: "100%",
-                          textAlign: lang === 2 ? "end" : "start"
+                          textAlign: lang === 2 ? "start" : "end"
                         }}
                         onChange={(e) => {
                           translate({
                             index: index,
-                            EXEC: item.EXEC,
-                            NUM: item.NUM,
+                            FORM: item.FORM,
+                            NAME: item.NAME,
                             value: e.target.value
                           });
                         }}
@@ -212,7 +212,9 @@ const Columns = ({ translateStore }) => {
                     )}
                     <Button
                       width={"12%"}
-                      disabled={translation ? !translation[index]?.isDirty : true}
+                      disabled={
+                        translation ? !translation[index]?.isDirty : true
+                      }
                       onClick={() => handleInputTranslate(index)}
                       style={{ alignSelf: "flex-start" }}>
                       {isLoading && (
@@ -229,7 +231,7 @@ const Columns = ({ translateStore }) => {
           </>
         )}
       </List>
-      <Pagination pageCount={pageCount} />
+      <Pagination pageCount={pageCount} pageName={location.pathname} currentPage={page} />
     </>
   );
 };
