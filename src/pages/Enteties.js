@@ -62,7 +62,8 @@ const Screens = ({ translateStore }) => {
       [params.index]: {
         ENAME: params.ENAME,
         TYPE: params.TYPE,
-        data: params.value || ""
+        data: params.value || "",
+        isDirty: true
       }
     };
     setTranslation(updatedTranslation);
@@ -192,6 +193,7 @@ const Screens = ({ translateStore }) => {
                   <Button
                     width={"12%"}
                     onClick={() => handleInputTranslate(index)}
+                    disabled={translation ? !translation[index]?.isDirty : true}
                     style={{ alignSelf: "flex-start" }}>
                     {isLoading && (
                       <div>

@@ -63,7 +63,8 @@ const Parameters = ({ translateStore }) => {
         PROG: params.PROG,
         KANG: params.PROG,
         NAME: params.NAME,
-        data: params.value || ""
+        data: params.value || "",
+        isDirty: true
       }
     };
     setTranslation(updatedTranslation);
@@ -190,6 +191,7 @@ const Parameters = ({ translateStore }) => {
                   <Button
                     width={"12%"}
                     onClick={() => handleInputTranslate(index)}
+                    disabled={translation ? !translation[index]?.isDirty : true}
                     style={{ alignSelf: "flex-start" }}>
                     {isLoading && (
                       <div>

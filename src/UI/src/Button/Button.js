@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const StyledButton = styled.button(
-  ({ theme, width, disabled, active, height }) => ({
+  ({ theme, width, disabled, active, height, isDirty }) => ({
     color: theme.color.white,
     height: height || 48,
     lineHeight: "8px",
@@ -13,7 +13,7 @@ const StyledButton = styled.button(
     background: active
       ? "green"
       : disabled
-      ? theme.color.gray
+      ? theme.color.scrollbar
       : theme.color.primary,
     cursor: disabled ? "default" : "pointer",
     border: 0,
