@@ -18,6 +18,57 @@ const TranslateStore = types
         );
       }
     };
+// טבלאות
+    const get_TRCATALOG = async (data) => {
+      self.setError("");
+      const response = await fetcher()
+        .post(data)
+        .from.translate.get_TRCATALOG();
+      if (response?.status === 200 && response?.data) {
+        return response.data;
+      } else {
+        self.setError(
+          response?.status === 400 || response?.status === 500
+            ? response?.data?.FORM?.InterfaceErrors?.text ||
+                "error:error_failed_get_TRCATALOG"
+            : "error:error_failed_get_TRCATALOG"
+        );
+      }
+    };
+
+    const add_TRCATALOG = async (data) => {
+      self.setError("");
+      const response = await fetcher()
+        .post(data)
+        .from.translate.add_TRCATALOG();
+      if (response?.status === 200 && response?.data) {
+        return response.data;
+      } else {
+        self.setError(
+          response?.status === 400 || response?.status === 500
+            ? response?.data?.FORM?.InterfaceErrors?.text ||
+                "error:error_failed_add_TRCATALOG"
+            : "error:error_failed_add_TRCATALOG"
+        );
+      }
+    };
+
+    const update_TRCATALOG = async (data) => {
+      self.setError("");
+      const response = await fetcher()
+        .post(data)
+        .from.translate.update_TRCATALOG();
+      if (response?.status === 200 && response?.data) {
+        return response.data;
+      } else {
+        self.setError(
+          response?.status === 400 || response?.status === 500
+            ? response?.data?.FORM?.InterfaceErrors?.text ||
+                "error:error_failed_update_TRCATALOG"
+            : "error:error_failed_update_TRCATALOG"
+        );
+      }
+    };
 
     const get_TRTRIGMSG = async (data) => {
       self.setError("");

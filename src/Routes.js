@@ -7,16 +7,18 @@ import Home from "./pages/Home";
 import Parameteres from "./pages/Parameteres";
 import Enteties from "./pages/Enteties";
 import Columns from "./pages/Columns";
+import Tables from "./pages/Tables";
 
 const AppRoutes = () => {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
-        <Route exact path="/proceedures" element={<Proceedures />} />
-        <Route exact path="/screens" element={<Screens />} />
-        <Route exact path="/parameters" element={<Parameteres />} />
-        <Route exact path="/enteties" element={<Enteties />} />
+        <Route exact path="/proceedures/:page?" element={<Proceedures />} />
+        <Route exact path="/screens/:page?" element={<Screens />} />
+        <Route exact path="/parameters/:page?" element={<Parameteres />} />
+        <Route exact path="/enteties/:page?" element={<Enteties />} />
         <Route exact path="/columns/:page?" element={<Columns />} />
+        <Route exact path="/tables/:page?" element={<Tables />} />
         <Route exact path="/" element={<Home />} />
       </Routes>
       <Link to={"/proceedures"} style={{ display: "none" }}>
@@ -36,6 +38,9 @@ const AppRoutes = () => {
       </Link>
       <Link to={"/columns"} style={{ display: "none" }}>
         linkToColumns
+      </Link>
+      <Link to={"/tables"} style={{ display: "none" }}>
+        linkToTablesns
       </Link>
     </Suspense>
   );
