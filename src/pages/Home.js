@@ -27,28 +27,63 @@ const Home = () => {
       <Title>רשימת המודולים לתרגום</Title>
       <List>
         <Item>
-          <Link to="/proceedures">
+          <Link to="/proceedures?page=1">
             <div href="#">תרגום הודעות של פרוצדורות</div>
           </Link>
         </Item>
         <Item>
-          <Link to="/screens">
+          <Link to="/screens?page=1">
             <div href="#">תרגום הודעות של מסכים</div>
           </Link>
         </Item>
         <Item>
-          <Link to="/enteties">
+          <Link to="/enteties?page=1">
             <div href="#">תרגום עזרות לישויות</div>
           </Link>
         </Item>
         <Item>
-          <Link to="/parameters">
+          <Link to="/parameters?page=1">
             <div href="#">תרגום עזרות פרמטרים לפרוצדורה</div>
           </Link>
         </Item>
         <Item>
           <Link to="/columns?page=1">
             <div href="#">תרגום עזרות לעמודות מסך</div>
+          </Link>
+        </Item>
+        <Item>
+          <Link to="/tables?page=1">
+            <div href="#">תרגום לטבלאות</div>
+          </Link>
+        </Item>
+        <Item>
+          <Link to="/tablesColumns?page=1">
+            <div href="#">תרגום לעמודות של טבלאות</div>
+          </Link>
+        </Item>
+        <Item>
+          <Link to="/titles?page=1">
+            <div href="#">תרגום לכותרות</div>
+          </Link>
+        </Item>
+        <Item>
+          <Link to="/programs?page=1">
+            <div href="#">תרגום לתוכניות</div>
+          </Link>
+        </Item>
+        <Item>
+          <Link to="/executions?page=1">
+            <div href="#">תרגום להפעלות</div>
+          </Link>
+        </Item>
+        <Item>
+          <Link to="/formColumns?page=1">
+            <div href="#">תרגום לעמודות של טפסים</div>
+          </Link>
+        </Item>
+        <Item>
+          <Link to="/epColumns?page=1">
+            <div href="#">תרגום לעמודות של משהו</div>
           </Link>
         </Item>
       </List>

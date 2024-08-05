@@ -66,7 +66,6 @@ const Parameters = ({ translateStore }) => {
 
   useEffect(() => {
     setTranslation(null);
-
     setTop(page * 50);
     setSkip(page * 50 - 50);
     setItemOffset((page - 1) * 10);
