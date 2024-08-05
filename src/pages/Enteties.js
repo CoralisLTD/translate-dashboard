@@ -41,6 +41,7 @@ const Screens = ({ translateStore }) => {
   const [top, setTop] = useState(50);
   const [skip, setSkip] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
+  const [allDataFetched, setAllDataFetched] = useState(false);
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const page = parseInt(searchParams.get("page")) || 1;
@@ -53,6 +54,9 @@ const Screens = ({ translateStore }) => {
     const fetchData = async () => {
       setLoading(true);
       const data = await translateStore.get_TRHELPEXEC();
+      if (data.length < top) {
+        setAllDataFetched(true);
+      }
       const list = data?.filter((item) => {
         let cleanText = getCleanText(item?.TRHELP_SUBFORM?.TEXT);
         if (!cleanText) return false;
@@ -61,7 +65,9 @@ const Screens = ({ translateStore }) => {
       setItems(list);
       setLoading(false);
     };
-    fetchData();
+    if (!allDataFetched) {
+      fetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [top, skip]);
 
@@ -168,14 +174,6 @@ const Screens = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {console.log("translation")}
-                    {console.log(
-                      "translation[index].data",
-                      translation && translation[index]
-                        ? translation[index]?.data
-                        : "sss"
-                    )}
-                    {console.log("translationValue", translationValue)}
                     {cleanText.length <= 130 ? (
                       <Input
                         label={cleanText}

@@ -3,7 +3,6 @@ import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
 import styled from "styled-components";
-import { reverseText, stripHtmlAndSpecialChars } from "../utils/text";
 import { useNavigate, useLocation } from "react-router-dom";
 import { TextArea } from "../UI/src/Input";
 import { Pagination } from "../components/Pagination";
@@ -33,7 +32,7 @@ const List = styled.div(() => ({
   }
 }));
 
-const Screens = ({ translateStore }) => {
+const FormColumns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -54,13 +53,12 @@ const Screens = ({ translateStore }) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const data = await translateStore.get_TRTRIGMSG();
+      const data = await translateStore.get_TRFORMCLMNS({ top, skip });
       if (data.length < top) {
         setAllDataFetched(true);
       }
       const list = data?.filter((item) => {
-        let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
-        if (!cleanText) return false;
+        if (!item?.TITLE) return false;
         return true;
       });
       setItems(list);
@@ -83,10 +81,9 @@ const Screens = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        EXEC: params.EXEC,
-        NUM: params.NUM,
-        data: params.value || "",
-        isDirty: true
+        NAME: params.NAME,
+        FORM: params.FORM,
+        data: params.value || ""
       }
     };
     setTranslation(updatedTranslation);
@@ -95,25 +92,22 @@ const Screens = ({ translateStore }) => {
   const handleInputTranslate = async (index) => {
     const body = {
       data: {
-        MESSAGE: translation[index]?.data.substring(0, 55),
-        LANGTRIGMSGTEXT_SUBFORM: {
-          TEXT: translation[index]?.data.substring(55)
-        },
+        TITLE: translation[index]?.data,
         LANG: lang
       },
-      EXEC: translation[index].EXEC,
-      NUM: translation[index].NUM
+      FORM: translation[index].FORM,
+      NAME: translation[index].NAME,
+      LANG: lang
     };
     setLoading(true);
     const res = isUpdate
-      ? await translateStore.update_TRTRIGMSG(body)
-      : await translateStore.add_TRTRIGMSG(body);
+      ? await translateStore.update_TRFORMCLMNS(body)
+      : await translateStore.add_TRFORMCLMNS(body);
     setLoading(false);
     if (res?.isSucceed) {
       console.log("data is saved");
     }
   };
-
   const endOffset = itemOffset + itemsPerPage;
   const currentItems = items.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(items.length / itemsPerPage);
@@ -139,7 +133,7 @@ const Screens = ({ translateStore }) => {
               <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
                 בחזרה לדף הראשי
               </div>
-              <Title>תרגום הודעות של מסכים</Title>
+              <Title>תרגום לעמודות של טפסים</Title>
             </div>
             <ul style={{ padding: 0 }}>
               <li>
@@ -158,22 +152,10 @@ const Screens = ({ translateStore }) => {
                 </div>
               </li>
               {currentItems?.map((item, index) => {
-                let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
-                if (item.TRTRIGMSGTEXT_SUBFORM?.TEXT) {
-                  cleanText =
-                    cleanText + reverseText(item.TRTRIGMSGTEXT_SUBFORM?.TEXT);
-                }
-                let translationValue = item.LANGTRIGMSG_SUBFORM.find(
-                  (it) => it.LANG === 2
-                )?.MESSAGE;
-
-                if (
-                  item.LANGTRIGMSG_SUBFORM[0]?.LANGTRIGMSGTEXT_SUBFORM?.TEXT
-                ) {
-                  translationValue =
-                    translationValue +
-                    item.LANGTRIGMSG_SUBFORM[0]?.LANGTRIGMSGTEXT_SUBFORM?.TEXT;
-                }
+                let translationValue = !!item?.LANGFORMCLMNS_SUBFORM?.length
+                  ? item?.LANGFORMCLMNS_SUBFORM?.find((it) => it.LANG === 2)
+                      ?.TITLE
+                  : "";
                 return (
                   <li
                     key={index}
@@ -184,9 +166,9 @@ const Screens = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {cleanText.length <= 130 ? (
+                    {item?.TITLE.length <= 130 ? (
                       <Input
-                        label={cleanText}
+                        label={item?.TITLE}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={
                           translation && translation[index]
@@ -197,8 +179,8 @@ const Screens = ({ translateStore }) => {
                         onChange={(e) => {
                           translate({
                             index: index,
-                            EXEC: item.EXEC,
-                            NUM: item.NUM,
+                            FORM: item.FORM,
+                            NAME: item.NAME,
                             value: e.target.value
                           });
                           setIsUpdate(!!translationValue);
@@ -206,8 +188,8 @@ const Screens = ({ translateStore }) => {
                       />
                     ) : (
                       <TextArea
-                        label={cleanText}
-                        rows={Math.ceil(cleanText.length / 80)}
+                        label={item?.TITLE}
+                        rows={Math.ceil(item?.TITLE.length / 80)}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={
                           translation && translation[index]
@@ -216,13 +198,13 @@ const Screens = ({ translateStore }) => {
                         }
                         style={{
                           height: "100%",
-                          textAlign: lang === 2 ? "start" : "end"
+                          textAlign: lang === 2 ? "end" : "start"
                         }}
                         onChange={(e) => {
                           translate({
                             index: index,
-                            EXEC: item.EXEC,
-                            NUM: item.NUM,
+                            FORM: item.FORM,
+                            NAME: item.NAME,
                             value: e.target.value
                           });
                           setIsUpdate(!!translationValue);
@@ -232,9 +214,6 @@ const Screens = ({ translateStore }) => {
                     <Button
                       width={"12%"}
                       onClick={() => handleInputTranslate(index)}
-                      disabled={
-                        translation ? !translation[index]?.isDirty : true
-                      }
                       style={{ alignSelf: "flex-start" }}>
                       {isLoading && (
                         <div>
@@ -259,4 +238,4 @@ const Screens = ({ translateStore }) => {
   );
 };
 
-export default inject("translateStore")(observer(Screens));
+export default inject("translateStore")(observer(FormColumns));
