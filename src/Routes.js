@@ -13,7 +13,7 @@ import Programs from "./pages/Programs";
 import Titles from "./pages/Titles";
 import Executions from "./pages/Executions";
 import FormColumns from "./pages/FormColumns";
-import EpColumns from "./pages/EpColumns";
+import ReportsColumns from "./pages/ReportsColumns";
 
 const AppRoutes = () => {
   return (
@@ -30,7 +30,7 @@ const AppRoutes = () => {
         <Route exact path="/programs/:page?" element={<Programs />} />
         <Route exact path="/executions/:page?" element={<Executions />} />
         <Route exact path="/formColumns/:page?" element={<FormColumns />} />
-        <Route exact path="/epColumns/:page?" element={<EpColumns />} />
+        <Route exact path="/reportsColumns/:page?" element={<ReportsColumns />} />
         <Route exact path="/" element={<Home />} />
       </Routes>
       <Link to={"/proceedures"} style={{ display: "none" }}>
@@ -69,8 +69,8 @@ const AppRoutes = () => {
       <Link to={"/formColumns"} style={{ display: "none" }}>
         linkToFormColumns
       </Link>
-      <Link to={"/epColumns"} style={{ display: "none" }}>
-        linkToEpColumns
+      <Link to={"/reportsColumns"} style={{ display: "none" }}>
+        linkToReportsColumns
       </Link>
     </Suspense>
   );

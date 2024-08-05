@@ -42,6 +42,8 @@ const Titles = ({ translateStore }) => {
   const [top, setTop] = useState(50);
   const [skip, setSkip] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
+  const [allDataFetched, setAllDataFetched] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -52,6 +54,9 @@ const Titles = ({ translateStore }) => {
     const fetchData = async () => {
       setLoading(true);
       const data = await translateStore.get_TRREPTITLE({ top, skip });
+      if (data.length < top) {
+        setAllDataFetched(true);
+      }
       const list = data?.filter((item) => {
         if (!item?.TITLE) return false;
         return true;
@@ -59,7 +64,9 @@ const Titles = ({ translateStore }) => {
       setItems(list);
       setLoading(false);
     };
-    fetchData();
+    if (!allDataFetched) {
+      fetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [top, skip]);
 
@@ -122,7 +129,7 @@ const Titles = ({ translateStore }) => {
               <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
                 בחזרה לדף הראשי
               </div>
-              <Title>תרגום לכותרות</Title>
+              <Title>תרגום לכותרות פלט</Title>
             </div>
             <ul style={{ padding: 0 }}>
               <li>

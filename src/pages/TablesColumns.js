@@ -42,6 +42,8 @@ const TableColumns = ({ translateStore }) => {
   const [top, setTop] = useState(50);
   const [skip, setSkip] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
+  const [allDataFetched, setAllDataFetched] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -52,6 +54,9 @@ const TableColumns = ({ translateStore }) => {
     const fetchData = async () => {
       setLoading(true);
       const data = await translateStore.get_TRCOLUMNS({ top, skip });
+      if (data.length < top) {
+        setAllDataFetched(true);
+      }
       const list = data?.filter((item) => {
         if (!item?.TITLE) return false;
         return true;
@@ -59,7 +64,9 @@ const TableColumns = ({ translateStore }) => {
       setItems(list);
       setLoading(false);
     };
-    fetchData();
+    if (!allDataFetched) {
+      fetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [top, skip]);
 

@@ -43,6 +43,8 @@ const Executions = ({ translateStore }) => {
   const [top, setTop] = useState(50);
   const [skip, setSkip] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
+  const [allDataFetched, setAllDataFetched] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -53,6 +55,9 @@ const Executions = ({ translateStore }) => {
     const fetchData = async () => {
       setLoading(true);
       const data = await translateStore.get_TREXEC({ top, skip });
+      if (data.length < top) {
+        setAllDataFetched(true);
+      }
       const list = data?.filter((item) => {
         if (!item?.TITLE) return false;
         return true;
@@ -60,7 +65,9 @@ const Executions = ({ translateStore }) => {
       setItems(list);
       setLoading(false);
     };
-    fetchData();
+    if (!allDataFetched) {
+      fetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [top, skip]);
 
@@ -95,9 +102,9 @@ const Executions = ({ translateStore }) => {
     };
     setLoading(true);
     const res = isUpdate
-      ? await translateStore.update_TREXEC(body)
-      : await translateStore.add_TREXEC(body);
-    setLoading(false);
+    ? await translateStore.update_TREXEC(body)
+    : await translateStore.add_TREXEC(body);
+      setLoading(false);
     if (res?.isSucceed) {
       console.log("data is saved");
     }
@@ -127,7 +134,7 @@ const Executions = ({ translateStore }) => {
               <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
                 בחזרה לדף הראשי
               </div>
-              <Title>תרגום להפעלות</Title>
+              <Title>תרגום ליישויות של Tabula</Title>
             </div>
             <ul style={{ padding: 0 }}>
               <li>
@@ -146,9 +153,10 @@ const Executions = ({ translateStore }) => {
                 </div>
               </li>
               {currentItems?.map((item, index) => {
-                let translationValue = !!item?.LANGEXEC_SUBFORM?.length
-                  ? item?.LANGEXEC_SUBFORM?.find((it) => it.LANG === 2)?.TITLE
-                  : "";
+                let translationValue =
+                  !!item?.LANGEXEC_SUBFORM?.length ?
+                  item?.LANGEXEC_SUBFORM?.find((it) => it.LANG === 2)
+                    ?.TITLE : "";
                 return (
                   <li
                     key={index}
@@ -177,6 +185,7 @@ const Executions = ({ translateStore }) => {
                             value: e.target.value
                           });
                           setIsUpdate(!!translationValue);
+
                         }}
                       />
                     ) : (
@@ -201,6 +210,7 @@ const Executions = ({ translateStore }) => {
                             value: e.target.value
                           });
                           setIsUpdate(!!translationValue);
+
                         }}
                       />
                     )}

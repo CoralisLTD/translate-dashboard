@@ -63,7 +63,7 @@ const Home = () => {
         </Item>
         <Item>
           <Link to="/titles?page=1">
-            <div href="#">תרגום לכותרות</div>
+            <div href="#">תרגום לכותרות פלט</div>
           </Link>
         </Item>
         <Item>
@@ -73,7 +73,7 @@ const Home = () => {
         </Item>
         <Item>
           <Link to="/executions?page=1">
-            <div href="#">תרגום להפעלות</div>
+            <div href="#">תרגום ליישויות של Tabula</div>
           </Link>
         </Item>
         <Item>
@@ -82,8 +82,8 @@ const Home = () => {
           </Link>
         </Item>
         <Item>
-          <Link to="/epColumns?page=1">
-            <div href="#">תרגום לעמודות של משהו</div>
+          <Link to="/reportsColumns?page=1">
+            <div href="#">תרגום לעמודות של דו״חות</div>
           </Link>
         </Item>
       </List>
