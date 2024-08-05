@@ -174,14 +174,6 @@ const Screens = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {console.log("translation")}
-                    {console.log(
-                      "translation[index].data",
-                      translation && translation[index]
-                        ? translation[index]?.data
-                        : "sss"
-                    )}
-                    {console.log("translationValue", translationValue)}
                     {cleanText.length <= 130 ? (
                       <Input
                         label={cleanText}
