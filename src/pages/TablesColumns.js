@@ -35,7 +35,7 @@ const List = styled.div(() => ({
 const TableColumns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -45,23 +45,24 @@ const TableColumns = ({ translateStore }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
 
-  useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TRCOLUMNS({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        if (!item?.TITLE) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRCOLUMNS({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      if (!item?.TITLE) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
+  useEffect(() => {
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -69,8 +70,8 @@ const TableColumns = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        TABLE: params.TABLE,
-        POS: params.POS,
+        TABLE: params.item.TABLE,
+        POS: params.item.POS,
         data: params.value || ""
       }
     };
@@ -92,8 +93,9 @@ const TableColumns = ({ translateStore }) => {
       ? await translateStore.update_TRCOLUMNS(body)
       : await translateStore.add_TRCOLUMNS(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
   const memoizedItems = useMemo(() => items, [items]);
@@ -173,12 +175,7 @@ const TableColumns = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            TABLE: item.TABLE,
-                            POS: item.POS,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -197,12 +194,7 @@ const TableColumns = ({ translateStore }) => {
                           textAlign: lang === 2 ? "end" : "start"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            TABLE: item.TABLE,
-                            POS: item.POS,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />

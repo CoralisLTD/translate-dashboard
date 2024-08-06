@@ -35,7 +35,7 @@ const List = styled.div(() => ({
 const Executions = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -44,24 +44,25 @@ const Executions = ({ translateStore }) => {
   const searchParams = new URLSearchParams(location.search);
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
-  
-  useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TREXEC({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        if (!item?.TITLE) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
 
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TREXEC({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      if (!item?.TITLE) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -69,8 +70,8 @@ const Executions = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        ENAME: params.ENAME,
-        TYPE: params.TYPE,
+        ENAME: params.item.ENAME,
+        TYPE: params.item.TYPE,
         data: params.value || ""
       }
     };
@@ -92,8 +93,9 @@ const Executions = ({ translateStore }) => {
       ? await translateStore.update_TREXEC(body)
       : await translateStore.add_TREXEC(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
 
@@ -173,12 +175,7 @@ const Executions = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            ENAME: item.ENAME,
-                            TYPE: item.TYPE,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -197,12 +194,7 @@ const Executions = ({ translateStore }) => {
                           textAlign: lang === 2 ? "end" : "start"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            ENAME: item.ENAME,
-                            TYPE: item.TYPE,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />

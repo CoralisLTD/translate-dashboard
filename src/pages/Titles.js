@@ -35,7 +35,7 @@ const List = styled.div(() => ({
 const Titles = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -45,23 +45,24 @@ const Titles = ({ translateStore }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
 
-  useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TRREPTITLE({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        if (!item?.TITLE) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRREPTITLE({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      if (!item?.TITLE) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
+  useEffect(() => {
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -69,7 +70,7 @@ const Titles = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        EXEC: params.EXEC,
+        EXEC: params.item.EXEC,
         data: params.value || ""
       }
     };
@@ -90,8 +91,9 @@ const Titles = ({ translateStore }) => {
       ? await translateStore.update_TRREPTITLE(body)
       : await translateStore.add_TRREPTITLE(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
   const memoizedItems = useMemo(() => items, [items]);
@@ -171,11 +173,7 @@ const Titles = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            EXEC: item.EXEC,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -194,11 +192,7 @@ const Titles = ({ translateStore }) => {
                           textAlign: lang === 2 ? "end" : "start"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            EXEC: item.EXEC,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />

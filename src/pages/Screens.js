@@ -36,7 +36,7 @@ const List = styled.div(() => ({
 const Screens = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -46,25 +46,25 @@ const Screens = ({ translateStore }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
 
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRTRIGMSG({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
+      if (!cleanText) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TRTRIGMSG({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        let cleanText = stripHtmlAndSpecialChars(item?.MESSAGE);
-        if (!cleanText) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
-
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -72,8 +72,8 @@ const Screens = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        EXEC: params.EXEC,
-        NUM: params.NUM,
+        EXEC: params.item.EXEC,
+        NUM: params.item.NUM,
         data: params.value || "",
         isDirty: true
       }
@@ -100,8 +100,9 @@ const Screens = ({ translateStore }) => {
       ? await translateStore.update_TRTRIGMSG(body)
       : await translateStore.add_TRTRIGMSG(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
 
@@ -159,13 +160,14 @@ const Screens = ({ translateStore }) => {
                   const translations = item.LANGTRIGMSG_SUBFORM.find(
                     (it) => it.LANG === 2
                   );
-                  
+
                   if (translations) {
                     translationValue = translations.MESSAGE;
+
                     if (translations.LANGTRIGMSGTEXT_SUBFORM?.TEXT) {
                       translationValue =
                         translationValue +
-                        item.LANGEXTMSG_SUBFORM[0]?.LANGTRIGMSGTEXT_SUBFORM
+                        item.LANGTRIGMSG_SUBFORM[0]?.LANGTRIGMSGTEXT_SUBFORM
                           ?.TEXT;
                     }
                   }
@@ -192,12 +194,7 @@ const Screens = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            EXEC: item.EXEC,
-                            NUM: item.NUM,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -216,12 +213,7 @@ const Screens = ({ translateStore }) => {
                           textAlign: lang === 2 ? "start" : "end"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            EXEC: item.EXEC,
-                            NUM: item.NUM,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />

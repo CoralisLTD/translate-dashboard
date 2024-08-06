@@ -35,7 +35,7 @@ const List = styled.div(() => ({
 const Columns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -45,24 +45,24 @@ const Columns = ({ translateStore }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
 
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRCATALOG({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      if (!item?.TITLE) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TRCATALOG({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        if (!item?.TITLE) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
-
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -70,7 +70,7 @@ const Columns = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        TNAME: params.TNAME,
+        TNAME: params.item.TNAME,
         data: params.value || ""
       }
     };
@@ -91,8 +91,9 @@ const Columns = ({ translateStore }) => {
       ? await translateStore.update_TRCATALOG(body)
       : await translateStore.add_TRCATALOG(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
 
@@ -173,11 +174,7 @@ const Columns = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            TNAME: item.TNAME,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -196,11 +193,7 @@ const Columns = ({ translateStore }) => {
                           textAlign: lang === 2 ? "end" : "start"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            TNAME: item.TNAME,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />

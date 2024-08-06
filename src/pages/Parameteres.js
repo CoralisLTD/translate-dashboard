@@ -36,7 +36,7 @@ const List = styled.div(() => ({
 const Parameters = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -46,24 +46,25 @@ const Parameters = ({ translateStore }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
 
-  useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TRHELPPROGRAM({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        let cleanText = getCleanText(item?.TRFORMCLMNHELP_SUBFORM?.TEXT);
-        if (!cleanText) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRHELPPROGRAM({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      let cleanText = getCleanText(item?.TRFORMCLMNHELP_SUBFORM?.TEXT);
+      if (!cleanText) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
+  useEffect(() => {
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -71,9 +72,8 @@ const Parameters = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        PROG: params.PROG,
-        KANG: params.PROG,
-        NAME: params.NAME,
+        PROG: params.item.PROG,
+        NAME: params.item.NAME,
         data: params.value || "",
         isDirty: true
       }
@@ -98,13 +98,13 @@ const Parameters = ({ translateStore }) => {
       ? await translateStore.update_TRHELPPROGRAM(body)
       : await translateStore.add_TRHELPPROGRAM(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
 
   const memoizedItems = useMemo(() => items, [items]);
-
 
   return (
     <>
@@ -184,12 +184,7 @@ const Parameters = ({ translateStore }) => {
                         )}
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            PROG: item.PROG,
-                            NAME: item.NAME,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -208,12 +203,7 @@ const Parameters = ({ translateStore }) => {
                           textAlign: lang === 2 ? "start" : "end"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            PROG: item.PROG,
-                            NAME: item.NAME,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />

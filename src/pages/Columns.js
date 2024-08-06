@@ -36,7 +36,7 @@ const List = styled.div(() => ({
 const Columns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -46,26 +46,27 @@ const Columns = ({ translateStore }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
 
-  useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TRHELPFORM({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        let cleanText = stripHtmlAndSpecialChars(
-          item?.TRFORMCLMNHELP_SUBFORM?.TEXT
-        );
-        if (!cleanText) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRHELPFORM({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      let cleanText = stripHtmlAndSpecialChars(
+        item?.TRFORMCLMNHELP_SUBFORM?.TEXT
+      );
+      if (!cleanText) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
+  useEffect(() => {
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -73,8 +74,8 @@ const Columns = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        FORM: params.FORM,
-        NAME: params.NAME,
+        FORM: params.item.FORM,
+        NAME: params.item.NAME,
         data: params.value || "",
         isDirty: true
       }
@@ -99,8 +100,9 @@ const Columns = ({ translateStore }) => {
       ? await translateStore.update_TRHELPFORM(body)
       : await translateStore.add_TRHELPFORM(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
   const memoizedItems = useMemo(() => items, [items]);
@@ -182,12 +184,7 @@ const Columns = ({ translateStore }) => {
                         )}
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            FORM: item.FORM,
-                            NAME: item.NAME,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -206,12 +203,7 @@ const Columns = ({ translateStore }) => {
                           textAlign: lang === 2 ? "start" : "end"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            FORM: item.FORM,
-                            NAME: item.NAME,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!translationValue);
                         }}
                       />

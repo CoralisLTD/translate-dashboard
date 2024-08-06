@@ -36,7 +36,7 @@ const List = styled.div(() => ({
 const Screens = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
 
@@ -47,24 +47,25 @@ const Screens = ({ translateStore }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
 
-  useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TRHELPEXEC({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        let cleanText = getCleanText(item?.TRHELP_SUBFORM?.TEXT);
-        if (!cleanText) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRHELPEXEC({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      let cleanText = getCleanText(item?.TRHELP_SUBFORM?.TEXT);
+      if (!cleanText) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
+  useEffect(() => {
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -72,8 +73,8 @@ const Screens = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        ENAME: params.ENAME,
-        TYPE: params.TYPE,
+        ENAME: params.item.ENAME,
+        TYPE: params.item.TYPE,
         data: params.value || "",
         isDirty: true
       }
@@ -98,8 +99,9 @@ const Screens = ({ translateStore }) => {
       ? await translateStore.update_TRHELPEXEC(body)
       : await translateStore.add_TRHELPEXEC(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
 
@@ -183,12 +185,7 @@ const Screens = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            ENAME: item.ENAME,
-                            TYPE: item.TYPE,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -207,12 +204,7 @@ const Screens = ({ translateStore }) => {
                           textAlign: lang === 2 ? "start" : "end"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            ENAME: item.ENAME,
-                            TYPE: item.TYPE,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />

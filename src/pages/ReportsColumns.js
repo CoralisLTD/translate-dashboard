@@ -35,7 +35,7 @@ const List = styled.div(() => ({
 const ReportsColumns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -45,24 +45,24 @@ const ReportsColumns = ({ translateStore }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
 
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRREPCLMNS({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      if (!item?.TITLE) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TRREPCLMNS({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        if (!item?.TITLE) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
-
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -70,8 +70,8 @@ const ReportsColumns = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        EXEC: params.EXEC,
-        POS: params.POS,
+        EXEC: params.item.EXEC,
+        POS: params.item.POS,
         data: params.value || ""
       }
     };
@@ -93,8 +93,9 @@ const ReportsColumns = ({ translateStore }) => {
       ? await translateStore.update_TRREPCLMNS(body)
       : await translateStore.add_TRREPCLMNS(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
   const memoizedItems = useMemo(() => items, [items]);
@@ -150,7 +151,7 @@ const ReportsColumns = ({ translateStore }) => {
                     translationValue = translations.TITLE;
                   }
                 }
-                
+
                 return (
                   <li
                     key={index}
@@ -172,12 +173,7 @@ const ReportsColumns = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            EXEC: item.EXEC,
-                            POS: item.POS,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -196,12 +192,7 @@ const ReportsColumns = ({ translateStore }) => {
                           textAlign: lang === 2 ? "end" : "start"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            EXEC: item.EXEC,
-                            POS: item.POS,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />

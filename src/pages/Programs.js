@@ -35,7 +35,7 @@ const List = styled.div(() => ({
 const Programs = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);  
+  const [isUpdate, setIsUpdate] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -45,24 +45,24 @@ const Programs = ({ translateStore }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
 
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRPROGPARAM({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      if (!item?.TITLE) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      const skip = (page - 1) * itemsPerPage;
-      const data = await translateStore.get_TRPROGPARAM({
-        skip,
-        limit: itemsPerPage
-      });
-      const list = data?.filter((item) => {
-        if (!item?.TITLE) return false;
-        return true;
-      });
-      setItems(list);
-      setPageCount(list.length < itemsPerPage ? page : page + 1);
-      setLoading(false);
-    };
-
+    setTranslation(null);
     fetchData(currentPage);
   }, [currentPage, translateStore]);
 
@@ -70,7 +70,8 @@ const Programs = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        EXEC: params.EXEC,
+        NAME: params.item.NAME,
+        PROG: params.item.PROG,
         data: params.value || ""
       }
     };
@@ -83,7 +84,8 @@ const Programs = ({ translateStore }) => {
         TITLE: translation[index]?.data,
         LANG: lang
       },
-      EXEC: translation[index].EXEC,
+      NAME: translation[index].NAME,
+      PROG: translation[index].PROG,
       LANG: lang
     };
     setLoading(true);
@@ -91,11 +93,12 @@ const Programs = ({ translateStore }) => {
       ? await translateStore.update_TRPROGPARAM(body)
       : await translateStore.add_TRPROGPARAM(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
-  
+
   const memoizedItems = useMemo(() => items, [items]);
 
   return (
@@ -140,14 +143,14 @@ const Programs = ({ translateStore }) => {
               {memoizedItems?.map((item, index) => {
                 let translationValue;
                 let hasTranslation = false;
-                if (item?.PROGPARAM_SUBFORM?.length > 0) {
+                if (item?.LANGPROGPARAM_SUBFORM?.length > 0) {
                   hasTranslation = true;
-                  const translations = item.PROGPARAM_SUBFORM.find(
+                  const translations = item.LANGPROGPARAM_SUBFORM.find(
                     (it) => it.LANG === 2
                   );
                   if (translations) {
                     translationValue =
-                      translations.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
+                      translations.TITLE;
                   }
                 }
                 return (
@@ -171,11 +174,7 @@ const Programs = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            EXEC: item.EXEC,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
@@ -194,11 +193,7 @@ const Programs = ({ translateStore }) => {
                           textAlign: lang === 2 ? "end" : "start"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            EXEC: item.EXEC,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
                           setIsUpdate(!!hasTranslation);
                         }}
                       />
