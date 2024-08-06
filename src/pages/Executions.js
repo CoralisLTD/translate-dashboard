@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
@@ -35,48 +35,36 @@ const List = styled.div(() => ({
 const Executions = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
-
+  const [isUpdate, setIsUpdate] = useState(false);  
+  const [pageCount, setPageCount] = useState(0);
   // eslint-disable-next-line no-unused-vars
-  const [lang, setLang] = useState(2);
+  const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
-  const [top, setTop] = useState(50);
-  const [skip, setSkip] = useState(0);
-  const [itemOffset, setItemOffset] = useState(0);
-  const [allDataFetched, setAllDataFetched] = useState(false);
-
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const page = parseInt(searchParams.get("page")) || 1;
+  const currentPage = parseInt(searchParams.get("page")) || 1;
   const itemsPerPage = 10;
-
+  
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (page) => {
       setLoading(true);
-      const data = await translateStore.get_TREXEC({ top, skip });
-      if (data.length < top) {
-        setAllDataFetched(true);
-      }
+      const skip = (page - 1) * itemsPerPage;
+      const data = await translateStore.get_TREXEC({
+        skip,
+        limit: itemsPerPage
+      });
       const list = data?.filter((item) => {
         if (!item?.TITLE) return false;
         return true;
       });
       setItems(list);
+      setPageCount(list.length < itemsPerPage ? page : page + 1);
       setLoading(false);
     };
-    if (!allDataFetched) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [top, skip]);
 
-  useEffect(() => {
-    setTranslation(null);
-    setTop(page * 50);
-    setSkip(page * 50 - 50);
-    setItemOffset((page - 1) * 10);
-  }, [page]);
+    fetchData(currentPage);
+  }, [currentPage, translateStore]);
 
   const translate = (params) => {
     const updatedTranslation = {
@@ -102,16 +90,15 @@ const Executions = ({ translateStore }) => {
     };
     setLoading(true);
     const res = isUpdate
-    ? await translateStore.update_TREXEC(body)
-    : await translateStore.add_TREXEC(body);
-      setLoading(false);
+      ? await translateStore.update_TREXEC(body)
+      : await translateStore.add_TREXEC(body);
+    setLoading(false);
     if (res?.isSucceed) {
       console.log("data is saved");
     }
   };
-  const endOffset = itemOffset + itemsPerPage;
-  const currentItems = items.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(items.length / itemsPerPage);
+
+  const memoizedItems = useMemo(() => items, [items]);
 
   return (
     <>
@@ -152,11 +139,20 @@ const Executions = ({ translateStore }) => {
                   <span>התרגום</span>
                 </div>
               </li>
-              {currentItems?.map((item, index) => {
-                let translationValue =
-                  !!item?.LANGEXEC_SUBFORM?.length ?
-                  item?.LANGEXEC_SUBFORM?.find((it) => it.LANG === 2)
-                    ?.TITLE : "";
+              {memoizedItems?.map((item, index) => {
+                let translationValue;
+                let hasTranslation = false;
+
+                if (item.LANGEXEC_SUBFORM.length > 0) {
+                  hasTranslation = true;
+                  const translations = item.LANGEXEC_SUBFORM.find(
+                    (it) => it.LANG === 2
+                  );
+                  if (translations) {
+                    translationValue = translations.TITLE;
+                  }
+                }
+
                 return (
                   <li
                     key={index}
@@ -184,8 +180,7 @@ const Executions = ({ translateStore }) => {
                             TYPE: item.TYPE,
                             value: e.target.value
                           });
-                          setIsUpdate(!!translationValue);
-
+                          setIsUpdate(!!hasTranslation);
                         }}
                       />
                     ) : (
@@ -209,8 +204,7 @@ const Executions = ({ translateStore }) => {
                             TYPE: item.TYPE,
                             value: e.target.value
                           });
-                          setIsUpdate(!!translationValue);
-
+                          setIsUpdate(!!hasTranslation);
                         }}
                       />
                     )}
@@ -235,7 +229,7 @@ const Executions = ({ translateStore }) => {
       <Pagination
         pageCount={pageCount}
         pageName={location.pathname}
-        currentPage={page}
+        currentPage={currentPage}
       />
     </>
   );

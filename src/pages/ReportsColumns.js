@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
@@ -35,47 +35,36 @@ const List = styled.div(() => ({
 const ReportsColumns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
-
-  // eslint-disable-next-line no-unused-vars
-  const [lang, setLang] = useState(2);
+  const [isUpdate, setIsUpdate] = useState(false);  
+  const [pageCount, setPageCount] = useState(0);
+  const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
-  const [top, setTop] = useState(50);
-  const [skip, setSkip] = useState(0);
-  const [itemOffset, setItemOffset] = useState(0);  
-  const [allDataFetched, setAllDataFetched] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const page = parseInt(searchParams.get("page")) || 1;
-  const itemsPerPage = 10;
+  const currentPage = parseInt(searchParams.get("page")) || 1;
+  const [itemsPerPage] = useState(10);
+
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (page) => {
       setLoading(true);
-      const data = await translateStore.get_TRREPCLMNS({ top, skip });
-      if (data?.length < top) {
-        setAllDataFetched(true);
-      }
+      const skip = (page - 1) * itemsPerPage;
+      const data = await translateStore.get_TRREPCLMNS({
+        skip,
+        limit: itemsPerPage
+      });
       const list = data?.filter((item) => {
         if (!item?.TITLE) return false;
         return true;
       });
       setItems(list);
+      setPageCount(list.length < itemsPerPage ? page : page + 1);
       setLoading(false);
     };
-    if (!allDataFetched) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [top, skip]);
 
-  useEffect(() => {
-    setTranslation(null);
-    setTop(page * 50);
-    setSkip(page * 50 - 50);
-    setItemOffset((page - 1) * 10);
-  }, [page]);
+    fetchData(currentPage);
+  }, [currentPage, translateStore]);
 
   const translate = (params) => {
     const updatedTranslation = {
@@ -108,9 +97,7 @@ const ReportsColumns = ({ translateStore }) => {
       console.log("data is saved");
     }
   };
-  const endOffset = itemOffset + itemsPerPage;
-  const currentItems = items.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(items.length / itemsPerPage);
+  const memoizedItems = useMemo(() => items, [items]);
 
   return (
     <>
@@ -151,11 +138,19 @@ const ReportsColumns = ({ translateStore }) => {
                   <span>התרגום</span>
                 </div>
               </li>
-              {currentItems?.map((item, index) => {
-                let translationValue = !!item?.LANGREPCLMNS_SUBFORM?.length
-                  ? item?.LANGREPCLMNS_SUBFORM?.find((it) => it.LANG === 2)
-                      ?.TITLE
-                  : "";
+              {memoizedItems?.map((item, index) => {
+                let translationValue;
+                let hasTranslation = false;
+                if (item?.LANGREPCLMNS_SUBFORM.length > 0) {
+                  hasTranslation = true;
+                  const translations = item.LANGREPCLMNS_SUBFORM.find(
+                    (it) => it.LANG === 2
+                  );
+                  if (translations) {
+                    translationValue = translations.TITLE;
+                  }
+                }
+                
                 return (
                   <li
                     key={index}
@@ -183,7 +178,7 @@ const ReportsColumns = ({ translateStore }) => {
                             POS: item.POS,
                             value: e.target.value
                           });
-                          setIsUpdate(!!translationValue);
+                          setIsUpdate(!!hasTranslation);
                         }}
                       />
                     ) : (
@@ -207,7 +202,7 @@ const ReportsColumns = ({ translateStore }) => {
                             POS: item.POS,
                             value: e.target.value
                           });
-                          setIsUpdate(!!translationValue);
+                          setIsUpdate(!!hasTranslation);
                         }}
                       />
                     )}
@@ -232,7 +227,7 @@ const ReportsColumns = ({ translateStore }) => {
       <Pagination
         pageCount={pageCount}
         pageName={location.pathname}
-        currentPage={page}
+        currentPage={currentPage}
       />
     </>
   );
