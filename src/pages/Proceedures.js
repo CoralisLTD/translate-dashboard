@@ -45,8 +45,7 @@ const Proceedures = ({ translateStore }) => {
   const searchParams = new URLSearchParams(location.search);
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
-
-
+  
   useEffect(() => {
     const fetchData = async (page) => {
       setLoading(true);

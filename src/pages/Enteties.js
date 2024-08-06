@@ -38,14 +38,14 @@ const Screens = ({ translateStore }) => {
   const [isLoading, setLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);  
   const [pageCount, setPageCount] = useState(0);
-  // eslint-disable-next-line no-unused-vars
   const [lang] = useState(2);
+
   const [translation, setTranslation] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const currentPage = parseInt(searchParams.get("page")) || 1;
-  const itemsPerPage = 10;
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchData = async (page) => {
