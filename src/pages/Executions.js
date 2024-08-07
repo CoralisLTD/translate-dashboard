@@ -57,7 +57,7 @@ const Executions = ({ translateStore }) => {
       return true;
     });
     setItems(list);
-    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setPageCount(list?.length < itemsPerPage ? page : page + 1);
     setLoading(false);
   };
 
@@ -144,7 +144,7 @@ const Executions = ({ translateStore }) => {
                 let translationValue;
                 let hasTranslation = false;
 
-                if (item.LANGEXEC_SUBFORM.length > 0) {
+                if (item.LANGEXEC_SUBFORM?.length > 0) {
                   hasTranslation = true;
                   const translations = item.LANGEXEC_SUBFORM.find(
                     (it) => it.LANG === 2
@@ -164,7 +164,7 @@ const Executions = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {item?.TITLE.length <= 130 ? (
+                    {item?.TITLE?.length <= 130 ? (
                       <Input
                         label={item?.TITLE}
                         direction={lang === 2 ? "ltr" : "rtl"}
@@ -182,7 +182,7 @@ const Executions = ({ translateStore }) => {
                     ) : (
                       <TextArea
                         label={item?.TITLE}
-                        rows={Math.ceil(item?.TITLE.length / 80)}
+                        rows={Math.ceil(item?.TITLE?.length / 80)}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={
                           translation && translation[index]

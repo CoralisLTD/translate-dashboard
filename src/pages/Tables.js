@@ -57,7 +57,7 @@ const Columns = ({ translateStore }) => {
       return true;
     });
     setItems(list);
-    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setPageCount(list?.length < itemsPerPage ? page : page + 1);
     setLoading(false);
   };
 
@@ -142,7 +142,7 @@ const Columns = ({ translateStore }) => {
                 let translationValue;
                 let hasTranslation = false;
 
-                if (item?.LANGCATALOG_SUBFORM.length > 0) {
+                if (item?.LANGCATALOG_SUBFORM?.length > 0) {
                   hasTranslation = true;
                   const translations = item.LANGCATALOG_SUBFORM.find(
                     (it) => it.LANG === 2
@@ -163,7 +163,7 @@ const Columns = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {item?.TITLE.length <= 130 ? (
+                    {item?.TITLE?.length <= 130 ? (
                       <Input
                         label={item?.TITLE}
                         direction={lang === 2 ? "ltr" : "rtl"}
@@ -181,7 +181,7 @@ const Columns = ({ translateStore }) => {
                     ) : (
                       <TextArea
                         label={item?.TITLE}
-                        rows={Math.ceil(item?.TITLE.length / 80)}
+                        rows={Math.ceil(item?.TITLE?.length / 80)}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={
                           translation && translation[index]

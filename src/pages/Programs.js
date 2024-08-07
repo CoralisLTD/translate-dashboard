@@ -57,7 +57,7 @@ const Programs = ({ translateStore }) => {
       return true;
     });
     setItems(list);
-    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setPageCount(list?.length < itemsPerPage ? page : page + 1);
     setLoading(false);
   };
 
@@ -163,7 +163,7 @@ const Programs = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {item?.TITLE.length <= 130 ? (
+                    {item?.TITLE?.length <= 130 ? (
                       <Input
                         label={item?.TITLE}
                         direction={lang === 2 ? "ltr" : "rtl"}
@@ -181,7 +181,7 @@ const Programs = ({ translateStore }) => {
                     ) : (
                       <TextArea
                         label={item?.TITLE}
-                        rows={Math.ceil(item?.TITLE.length / 80)}
+                        rows={Math.ceil(item?.TITLE?.length / 80)}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={
                           translation && translation[index]

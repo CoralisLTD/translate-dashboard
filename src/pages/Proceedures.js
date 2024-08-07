@@ -59,7 +59,7 @@ const Proceedures = ({ translateStore }) => {
       return true;
     });
     setItems(list);
-    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setPageCount(list?.length < itemsPerPage ? page : page + 1);
     setLoading(false);
   };
   useEffect(() => {
@@ -154,7 +154,7 @@ const Proceedures = ({ translateStore }) => {
                   cleanText =
                     cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
                 }
-                if (item.LANGEXTMSG_SUBFORM.length > 0) {
+                if (item.LANGEXTMSG_SUBFORM?.length > 0) {
                   hasTranslation = true;
                   const translations = item.LANGEXTMSG_SUBFORM.find(
                     (it) => it.LANG === 2
@@ -181,7 +181,7 @@ const Proceedures = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {cleanText.length <= 130 ? (
+                    {cleanText?.length <= 130 ? (
                       <Input
                         label={cleanText}
                         direction={lang === 2 ? "ltr" : "rtl"}
@@ -199,7 +199,7 @@ const Proceedures = ({ translateStore }) => {
                     ) : (
                       <TextArea
                         label={cleanText}
-                        rows={Math.ceil(cleanText.length / 80)}
+                        rows={Math.ceil(cleanText?.length / 80)}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={
                           translation && translation[index]
