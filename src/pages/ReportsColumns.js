@@ -32,7 +32,7 @@ const List = styled.div(() => ({
   }
 }));
 
-const Programs = ({ translateStore }) => {
+const ReportsColumns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -48,7 +48,7 @@ const Programs = ({ translateStore }) => {
   const fetchData = async (page) => {
     setLoading(true);
     const skip = (page - 1) * itemsPerPage;
-    const data = await translateStore.get_TRPROGPARAM({
+    const data = await translateStore.get_TRREPCLMNS({
       skip,
       limit: itemsPerPage
     });
@@ -70,8 +70,8 @@ const Programs = ({ translateStore }) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        NAME: params.item.NAME,
-        PROG: params.item.PROG,
+        EXEC: params.item.EXEC,
+        POS: params.item.POS,
         data: params.value || ""
       }
     };
@@ -84,21 +84,20 @@ const Programs = ({ translateStore }) => {
         TITLE: translation[index]?.data,
         LANG: lang
       },
-      NAME: translation[index].NAME,
-      PROG: translation[index].PROG,
+      EXEC: translation[index].EXEC,
+      POS: translation[index].POS,
       LANG: lang
     };
     setLoading(true);
     const res = isUpdate
-      ? await translateStore.update_TRPROGPARAM(body)
-      : await translateStore.add_TRPROGPARAM(body);
+      ? await translateStore.update_TRREPCLMNS(body)
+      : await translateStore.add_TRREPCLMNS(body);
     setLoading(false);
     if (res) {
       console.log("data is saved");
       fetchData(currentPage);
     }
   };
-
   const memoizedItems = useMemo(() => items, [items]);
 
   return (
@@ -122,7 +121,7 @@ const Programs = ({ translateStore }) => {
               <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
                 בחזרה לדף הראשי
               </div>
-              <Title>תרגום פרמטרים לפרוצדורות</Title>
+              <Title>תרגום לעמודות של דו״חות</Title>
             </div>
             <ul style={{ padding: 0 }}>
               <li>
@@ -143,16 +142,16 @@ const Programs = ({ translateStore }) => {
               {memoizedItems?.map((item, index) => {
                 let translationValue;
                 let hasTranslation = false;
-                if (item?.LANGPROGPARAM_SUBFORM?.length > 0) {
+                if (item?.LANGREPCLMNS_SUBFORM.length > 0) {
                   hasTranslation = true;
-                  const translations = item.LANGPROGPARAM_SUBFORM.find(
+                  const translations = item.LANGREPCLMNS_SUBFORM.find(
                     (it) => it.LANG === 2
                   );
                   if (translations) {
-                    translationValue =
-                      translations.TITLE;
+                    translationValue = translations.TITLE;
                   }
                 }
+
                 return (
                   <li
                     key={index}
@@ -225,4 +224,4 @@ const Programs = ({ translateStore }) => {
   );
 };
 
-export default inject("translateStore")(observer(Programs));
+export default inject("translateStore")(observer(ReportsColumns));

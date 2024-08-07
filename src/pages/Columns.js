@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
@@ -36,55 +36,46 @@ const List = styled.div(() => ({
 const Columns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [lang, setLang] = useState(2);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [pageCount, setPageCount] = useState(0);
+  const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
-  const [top, setTop] = useState(50);
-  const [skip, setSkip] = useState(0);
-  const [itemOffset, setItemOffset] = useState(0);
-  const [allDataFetched, setAllDataFetched] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const page = parseInt(searchParams.get("page")) || 1;
-  const itemsPerPage = 10;
+  const currentPage = parseInt(searchParams.get("page")) || 1;
+  const [itemsPerPage] = useState(10);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const data = await translateStore.get_TRHELPFORM({ top, skip });
-      if (data.length < top) {
-        setAllDataFetched(true);
-      }
-      const list = data?.filter((item) => {
-        let cleanText = stripHtmlAndSpecialChars(
-          item?.TRFORMCLMNHELP_SUBFORM?.TEXT
-        );
-        if (!cleanText) return false;
-        return true;
-      });
-      setItems(list);
-      setLoading(false);
-    };
-    if (!allDataFetched) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [top, skip]);
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRHELPFORM({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      let cleanText = stripHtmlAndSpecialChars(
+        item?.TRFORMCLMNHELP_SUBFORM?.TEXT
+      );
+      if (!cleanText) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
   useEffect(() => {
     setTranslation(null);
-    setTop(page * 50);
-    setSkip(page * 50 - 50);
-    setItemOffset((page - 1) * 10);
-  }, [page]);
+    fetchData(currentPage);
+  }, [currentPage, translateStore]);
 
   const translate = (params) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        FORM: params.FORM,
-        NAME: params.NAME,
+        FORM: params.item.FORM,
+        NAME: params.item.NAME,
         data: params.value || "",
         isDirty: true
       }
@@ -105,16 +96,16 @@ const Columns = ({ translateStore }) => {
       GLANG: "en-GB"
     };
     setLoading(true);
-    const res = await translateStore.update_TRHELPFORM(body);
+    const res = isUpdate
+      ? await translateStore.update_TRHELPFORM(body)
+      : await translateStore.add_TRHELPFORM(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
-
-  const endOffset = itemOffset + itemsPerPage;
-  const currentItems = items.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(items.length / itemsPerPage);
+  const memoizedItems = useMemo(() => items, [items]);
 
   return (
     <>
@@ -155,14 +146,23 @@ const Columns = ({ translateStore }) => {
                   <span>התרגום</span>
                 </div>
               </li>
-              {currentItems?.map((item, index) => {
+              {memoizedItems?.map((item, index) => {
                 let cleanText = getCleanText(
                   item?.TRFORMCLMNHELP_SUBFORM?.TEXT
                 );
-                let translationValue =
-                  !!item?.TRLANGS2_SUBFORM.length &&
-                  item?.TRLANGS2_SUBFORM?.find((it) => it.LANG === 2)
-                    ?.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
+                let translationValue;
+                let hasTranslation = false;
+                if (item?.TRLANGS2_SUBFORM.length > 0) {
+                  hasTranslation = true;
+                  const translations = item.TRLANGS2_SUBFORM.find(
+                    (it) => it.LANG === 2
+                  );
+                  if (translations) {
+                    translationValue =
+                      translations.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
+                  }
+                }
+
                 return (
                   <li
                     key={index}
@@ -184,12 +184,8 @@ const Columns = ({ translateStore }) => {
                         )}
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            FORM: item.FORM,
-                            NAME: item.NAME,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
+                          setIsUpdate(!!hasTranslation);
                         }}
                       />
                     ) : (
@@ -207,12 +203,8 @@ const Columns = ({ translateStore }) => {
                           textAlign: lang === 2 ? "start" : "end"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            FORM: item.FORM,
-                            NAME: item.NAME,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
+                          setIsUpdate(!!translationValue);
                         }}
                       />
                     )}
@@ -237,7 +229,11 @@ const Columns = ({ translateStore }) => {
           </>
         )}
       </List>
-      <Pagination pageCount={pageCount} pageName={location.pathname} currentPage={page} />
+      <Pagination
+        pageCount={pageCount}
+        pageName={location.pathname}
+        currentPage={currentPage}
+      />
     </>
   );
 };

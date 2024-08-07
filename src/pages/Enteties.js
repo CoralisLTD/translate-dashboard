@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Input } from "../UI";
 import { ClipLoader } from "react-spinners";
@@ -7,6 +7,7 @@ import { reverseText, getCleanText } from "../utils/text";
 import { useNavigate, useLocation } from "react-router-dom";
 import { TextArea } from "../UI/src/Input";
 import { Pagination } from "../components/Pagination";
+
 const Title = styled.div(() => ({
   fontSize: 30
 }));
@@ -35,55 +36,45 @@ const List = styled.div(() => ({
 const Screens = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [lang, setLang] = useState(2);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [pageCount, setPageCount] = useState(0);
+  const [lang] = useState(2);
+
   const [translation, setTranslation] = useState(null);
-  const [top, setTop] = useState(50);
-  const [skip, setSkip] = useState(0);
-  const [itemOffset, setItemOffset] = useState(0);
-  const [allDataFetched, setAllDataFetched] = useState(false);
+  const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const page = parseInt(searchParams.get("page")) || 1;
-  // const memoizeditems = useMemo(() => items, [items]);
-  const itemsPerPage = 10;
+  const currentPage = parseInt(searchParams.get("page")) || 1;
+  const [itemsPerPage] = useState(10);
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const data = await translateStore.get_TRHELPEXEC();
-      if (data.length < top) {
-        setAllDataFetched(true);
-      }
-      const list = data?.filter((item) => {
-        let cleanText = getCleanText(item?.TRHELP_SUBFORM?.TEXT);
-        if (!cleanText) return false;
-        return true;
-      });
-      setItems(list);
-      setLoading(false);
-    };
-    if (!allDataFetched) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [top, skip]);
+  const fetchData = async (page) => {
+    setLoading(true);
+    const skip = (page - 1) * itemsPerPage;
+    const data = await translateStore.get_TRHELPEXEC({
+      skip,
+      limit: itemsPerPage
+    });
+    const list = data?.filter((item) => {
+      let cleanText = getCleanText(item?.TRHELP_SUBFORM?.TEXT);
+      if (!cleanText) return false;
+      return true;
+    });
+    setItems(list);
+    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setLoading(false);
+  };
 
   useEffect(() => {
     setTranslation(null);
-    setTop(page * 50);
-    setSkip(page * 50 - 50);
-    setItemOffset((page - 1) * 10);
-  }, [page]);
+    fetchData(currentPage);
+  }, [currentPage, translateStore]);
 
   const translate = (params) => {
     const updatedTranslation = {
       ...translation,
       [params.index]: {
-        ENAME: params.ENAME,
-        TYPE: params.TYPE,
+        ENAME: params.item.ENAME,
+        TYPE: params.item.TYPE,
         data: params.value || "",
         isDirty: true
       }
@@ -104,16 +95,17 @@ const Screens = ({ translateStore }) => {
       GLANG: "en-GB"
     };
     setLoading(true);
-    const res = await translateStore.update_TRHELPEXEC(body);
+    const res = isUpdate
+      ? await translateStore.update_TRHELPEXEC(body)
+      : await translateStore.add_TRHELPEXEC(body);
     setLoading(false);
-    if (res?.isSucceed) {
+    if (res) {
       console.log("data is saved");
+      fetchData(currentPage);
     }
   };
 
-  const endOffset = itemOffset + itemsPerPage;
-  const currentItems = items.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(items.length / itemsPerPage);
+  const memoizedItems = useMemo(() => items, [items]);
 
   return (
     <>
@@ -154,16 +146,24 @@ const Screens = ({ translateStore }) => {
                   <span>התרגום</span>
                 </div>
               </li>
-              {currentItems?.map((item, index) => {
+              {memoizedItems?.map((item, index) => {
                 let cleanText = getCleanText(item?.TRHELP_SUBFORM?.TEXT);
+                let translationValue;
+                let hasTranslation = false;
                 if (item.TREXTMSGTEXT_SUBFORM?.TEXT) {
                   cleanText =
                     cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
                 }
-                let translationValue = item.TRLANGS_SUBFORM?.find(
-                  (it) => it.LANG === 2
-                )?.LANGHELP2_SUBFORM?.TEXT;
-                translationValue = getCleanText(translationValue);
+                if (item.TRLANGS_SUBFORM.length > 0) {
+                  hasTranslation = true;
+                  const translations = item.TRLANGS_SUBFORM.find(
+                    (it) => it.LANG === 2
+                  );
+                  if (translations) {
+                    translationValue = translations.TEXT;
+                    translationValue = getCleanText(translationValue);
+                  }
+                }
                 return (
                   <li
                     key={index}
@@ -185,12 +185,8 @@ const Screens = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            ENAME: item.ENAME,
-                            TYPE: item.TYPE,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
+                          setIsUpdate(!!hasTranslation);
                         }}
                       />
                     ) : (
@@ -208,12 +204,8 @@ const Screens = ({ translateStore }) => {
                           textAlign: lang === 2 ? "start" : "end"
                         }}
                         onChange={(e) => {
-                          translate({
-                            index: index,
-                            ENAME: item.ENAME,
-                            TYPE: item.TYPE,
-                            value: e.target.value
-                          });
+                          translate({ index, item, value: e.target.value });
+                          setIsUpdate(!!hasTranslation);
                         }}
                       />
                     )}
@@ -241,7 +233,7 @@ const Screens = ({ translateStore }) => {
       <Pagination
         pageCount={pageCount}
         pageName={location.pathname}
-        currentPage={page}
+        currentPage={currentPage}
       />
     </>
   );
