@@ -35,7 +35,7 @@ const List = styled.div(() => ({
 const ReportsColumns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -57,7 +57,7 @@ const ReportsColumns = ({ translateStore }) => {
       return true;
     });
     setItems(list);
-    setPageCount(list?.length < itemsPerPage ? page : page + 1);
+    setPageCount(data?.length < itemsPerPage ? page : page + 1);
     setLoading(false);
   };
 
@@ -72,7 +72,9 @@ const ReportsColumns = ({ translateStore }) => {
       [params.index]: {
         EXEC: params.item.EXEC,
         POS: params.item.POS,
-        data: params.value || ""
+        data: params.value || "",
+        isDirty: true,
+        isUpdate: params.isUpdate
       }
     };
     setTranslation(updatedTranslation);
@@ -88,14 +90,15 @@ const ReportsColumns = ({ translateStore }) => {
       POS: translation[index].POS,
       LANG: lang
     };
-    setLoading(true);
-    const res = isUpdate
+    setIsSaving(true);
+    const res = translation[index].isUpdate
       ? await translateStore.update_TRREPCLMNS(body)
       : await translateStore.add_TRREPCLMNS(body);
-    setLoading(false);
+    setIsSaving(false);
     if (res) {
       console.log("data is saved");
       fetchData(currentPage);
+      translation[index].isDirty = false;
     }
   };
   const memoizedItems = useMemo(() => items, [items]);
@@ -173,8 +176,12 @@ const ReportsColumns = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({ index, item, value: e.target.value });
-                          setIsUpdate(!!hasTranslation);
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation
+                          });
                         }}
                       />
                     ) : (
@@ -192,18 +199,25 @@ const ReportsColumns = ({ translateStore }) => {
                           textAlign: lang === 2 ? "end" : "start"
                         }}
                         onChange={(e) => {
-                          translate({ index, item, value: e.target.value });
-                          setIsUpdate(!!hasTranslation);
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation
+                          });
                         }}
                       />
                     )}
                     <Button
                       width={"12%"}
                       onClick={() => handleInputTranslate(index)}
+                      disabled={
+                        translation ? !translation[index]?.isDirty : true
+                      }
                       style={{ alignSelf: "flex-start" }}>
-                      {isLoading && (
+                      {isSaving && (
                         <div>
-                          <ClipLoader color={"red"} />
+                          <ClipLoader color={"white"} />
                         </div>
                       )}
                       שמור
@@ -214,12 +228,36 @@ const ReportsColumns = ({ translateStore }) => {
             </ul>
           </>
         )}
+        {isLoading ? (
+          <></>
+        ) : (
+          <Button
+            width={"12%"}
+            onClick={async () => {
+              Object.entries(translation).map((item, index) => {
+                handleInputTranslate(index);
+              });
+            }}
+            disabled={translation === null}
+            style={{ alignSelf: "flex-start" }}>
+            {isSaving && (
+              <div>
+                <ClipLoader color={"white"} />
+              </div>
+            )}
+            שמור הכל
+          </Button>
+        )}
       </List>
-      <Pagination
-        pageCount={pageCount}
-        pageName={location.pathname}
-        currentPage={currentPage}
-      />
+      {isLoading ? (
+        <></>
+      ) : (
+        <Pagination
+          pageCount={pageCount}
+          pageName={location.pathname}
+          currentPage={currentPage}
+        />
+      )}
     </>
   );
 };
