@@ -36,7 +36,7 @@ const List = styled.div(() => ({
 const Proceedures = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -59,7 +59,7 @@ const Proceedures = ({ translateStore }) => {
       return true;
     });
     setItems(list);
-    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setPageCount(data?.length < itemsPerPage ? page : page + 1);
     setLoading(false);
   };
   useEffect(() => {
@@ -74,7 +74,8 @@ const Proceedures = ({ translateStore }) => {
         EXEC: params.item.EXEC,
         NUM: params.item.NUM,
         data: params.value || "",
-        isDirty: true
+        isDirty: true,
+        isUpdate: params.isUpdate
       }
     };
     setTranslation(updatedTranslation);
@@ -93,14 +94,15 @@ const Proceedures = ({ translateStore }) => {
       NUM: translation[index].NUM,
       LANG: lang
     };
-    setLoading(true);
-    const res = isUpdate
+    setIsSaving(true);
+    const res = translation[index].isUpdate
       ? await translateStore.update_TREXTMSG(body)
       : await translateStore.add_TREXTMSG(body);
-    setLoading(false);
+    setIsSaving(false);
     if (res) {
       console.log("data is saved");
       fetchData(currentPage);
+      translation[index].isDirty = false;
     }
   };
 
@@ -154,7 +156,7 @@ const Proceedures = ({ translateStore }) => {
                   cleanText =
                     cleanText + reverseText(item.TREXTMSGTEXT_SUBFORM?.TEXT);
                 }
-                if (item.LANGEXTMSG_SUBFORM.length > 0) {
+                if (item.LANGEXTMSG_SUBFORM?.length > 0) {
                   hasTranslation = true;
                   const translations = item.LANGEXTMSG_SUBFORM.find(
                     (it) => it.LANG === 2
@@ -170,7 +172,6 @@ const Proceedures = ({ translateStore }) => {
                     }
                   }
                 }
-
                 return (
                   <li
                     key={index}
@@ -181,7 +182,7 @@ const Proceedures = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {cleanText.length <= 130 ? (
+                    {cleanText?.length <= 130 ? (
                       <Input
                         label={cleanText}
                         direction={lang === 2 ? "ltr" : "rtl"}
@@ -192,14 +193,18 @@ const Proceedures = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({ index, item, value: e.target.value });
-                          setIsUpdate(!!hasTranslation);
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation
+                          });
                         }}
                       />
                     ) : (
                       <TextArea
                         label={cleanText}
-                        rows={Math.ceil(cleanText.length / 80)}
+                        rows={Math.ceil(cleanText?.length / 80)}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={
                           translation && translation[index]
@@ -211,8 +216,12 @@ const Proceedures = ({ translateStore }) => {
                           textAlign: lang === 2 ? "start" : "end"
                         }}
                         onChange={(e) => {
-                          translate({ index, item, value: e.target.value });
-                          setIsUpdate(!!hasTranslation);
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation
+                          });
                         }}
                       />
                     )}
@@ -225,7 +234,7 @@ const Proceedures = ({ translateStore }) => {
                       style={{ alignSelf: "flex-start" }}>
                       {isLoading && (
                         <div>
-                          <ClipLoader color={"red"} />
+                          <ClipLoader color={"white"} />
                         </div>
                       )}
                       שמור
@@ -236,12 +245,36 @@ const Proceedures = ({ translateStore }) => {
             </ul>
           </>
         )}
+        {isLoading ? (
+          <></>
+        ) : (
+          <Button
+            width={"12%"}
+            onClick={async () => {
+              Object.entries(translation).map((item, index) => {
+                handleInputTranslate(index);
+              });
+            }}
+            disabled={translation === null}
+            style={{ alignSelf: "flex-start" }}>
+            {isSaving && (
+              <div>
+                <ClipLoader color={"white"} />
+              </div>
+            )}
+            שמור הכל
+          </Button>
+        )}
       </List>
-      <Pagination
-        pageCount={pageCount}
-        pageName={location.pathname}
-        currentPage={currentPage}
-      />
+      {isLoading ? (
+        <></>
+      ) : (
+        <Pagination
+          pageCount={pageCount}
+          pageName={location.pathname}
+          currentPage={currentPage}
+        />
+      )}
     </>
   );
 };

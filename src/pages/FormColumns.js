@@ -35,7 +35,7 @@ const List = styled.div(() => ({
 const FormColumns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -44,7 +44,7 @@ const FormColumns = ({ translateStore }) => {
   const searchParams = new URLSearchParams(location.search);
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [itemsPerPage] = useState(10);
-  
+
   const fetchData = async (page) => {
     setLoading(true);
     const skip = (page - 1) * itemsPerPage;
@@ -57,7 +57,7 @@ const FormColumns = ({ translateStore }) => {
       return true;
     });
     setItems(list);
-    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setPageCount(data?.length < itemsPerPage ? page : page + 1);
     setLoading(false);
   };
 
@@ -72,7 +72,9 @@ const FormColumns = ({ translateStore }) => {
       [params.index]: {
         NAME: params.item.NAME,
         FORM: params.item.FORM,
-        data: params.value || ""
+        data: params.value || "",
+        isDirty: true,
+        isUpdate: params.isUpdate
       }
     };
     setTranslation(updatedTranslation);
@@ -88,14 +90,15 @@ const FormColumns = ({ translateStore }) => {
       NAME: translation[index].NAME,
       LANG: lang
     };
-    setLoading(true);
-    const res = isUpdate
+    setIsSaving(true);
+    const res = translation[index].isUpdate
       ? await translateStore.update_TRFORMCLMNS(body)
       : await translateStore.add_TRFORMCLMNS(body);
-    setLoading(false);
+    setIsSaving(false);
     if (res) {
       console.log("data is saved");
       fetchData(currentPage);
+      translation[index].isDirty = false;
     }
   };
 
@@ -144,7 +147,7 @@ const FormColumns = ({ translateStore }) => {
                 let translationValue;
                 let hasTranslation = false;
 
-                if (item.LANGFORMCLMNS_SUBFORM.length > 0) {
+                if (item.LANGFORMCLMNS_SUBFORM?.length > 0) {
                   hasTranslation = true;
                   const translations = item.LANGFORMCLMNS_SUBFORM.find(
                     (it) => it.LANG === 2
@@ -153,7 +156,6 @@ const FormColumns = ({ translateStore }) => {
                     translationValue = translations.TITLE;
                   }
                 }
-
                 return (
                   <li
                     key={index}
@@ -164,7 +166,7 @@ const FormColumns = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {item?.TITLE.length <= 130 ? (
+                    {item?.TITLE?.length <= 130 ? (
                       <Input
                         label={item?.TITLE}
                         direction={lang === 2 ? "ltr" : "rtl"}
@@ -175,14 +177,18 @@ const FormColumns = ({ translateStore }) => {
                         }
                         type="text"
                         onChange={(e) => {
-                          translate({ index, item, value: e.target.value });
-                          setIsUpdate(!!hasTranslation);
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation
+                          });
                         }}
                       />
                     ) : (
                       <TextArea
                         label={item?.TITLE}
-                        rows={Math.ceil(item?.TITLE.length / 80)}
+                        rows={Math.ceil(item?.TITLE?.length / 80)}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={
                           translation && translation[index]
@@ -194,18 +200,25 @@ const FormColumns = ({ translateStore }) => {
                           textAlign: lang === 2 ? "end" : "start"
                         }}
                         onChange={(e) => {
-                          translate({ index, item, value: e.target.value });
-                          setIsUpdate(!!hasTranslation);
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation
+                          });
                         }}
                       />
                     )}
                     <Button
                       width={"12%"}
                       onClick={() => handleInputTranslate(index)}
+                      disabled={
+                        translation ? !translation[index]?.isDirty : true
+                      }
                       style={{ alignSelf: "flex-start" }}>
-                      {isLoading && (
+                      {isSaving && (
                         <div>
-                          <ClipLoader color={"red"} />
+                          <ClipLoader color={"white"} />
                         </div>
                       )}
                       שמור
@@ -216,12 +229,36 @@ const FormColumns = ({ translateStore }) => {
             </ul>
           </>
         )}
+        {isLoading ? (
+          <></>
+        ) : (
+          <Button
+            width={"12%"}
+            onClick={async () => {
+              Object.entries(translation).map((item, index) => {
+                handleInputTranslate(index);
+              });
+            }}
+            disabled={translation === null}
+            style={{ alignSelf: "flex-start" }}>
+            {isSaving && (
+              <div>
+                <ClipLoader color={"white"} />
+              </div>
+            )}
+            שמור הכל
+          </Button>
+        )}
       </List>
-      <Pagination
-        pageCount={pageCount}
-        pageName={location.pathname}
-        currentPage={currentPage}
-      />
+      {isLoading ? (
+        <></>
+      ) : (
+        <Pagination
+          pageCount={pageCount}
+          pageName={location.pathname}
+          currentPage={currentPage}
+        />
+      )}
     </>
   );
 };

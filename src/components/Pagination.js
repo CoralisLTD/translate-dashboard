@@ -72,7 +72,7 @@ export const Pagination = ({ pageCount, pageName, currentPage }) => {
         subContainerClassName={"pages pagination"}
         activeClassName={"active"}
         disabledClassName={"disabled"}
-        forcePage={currentPage  - 1}
+        forcePage={Math.min(currentPage - 1, pageCount - 1)}
       />
     </PaginationContainer>
   );

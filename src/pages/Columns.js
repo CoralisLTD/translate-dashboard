@@ -36,7 +36,7 @@ const List = styled.div(() => ({
 const Columns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -61,7 +61,7 @@ const Columns = ({ translateStore }) => {
       return true;
     });
     setItems(list);
-    setPageCount(list.length < itemsPerPage ? page : page + 1);
+    setPageCount(data?.length < itemsPerPage ? page : page + 1);
     setLoading(false);
   };
 
@@ -77,7 +77,8 @@ const Columns = ({ translateStore }) => {
         FORM: params.item.FORM,
         NAME: params.item.NAME,
         data: params.value || "",
-        isDirty: true
+        isDirty: true,
+        isUpdate: params.isUpdate
       }
     };
     setTranslation(updatedTranslation);
@@ -95,14 +96,15 @@ const Columns = ({ translateStore }) => {
       FORM: translation[index].FORM,
       GLANG: "en-GB"
     };
-    setLoading(true);
-    const res = isUpdate
+    setIsSaving(true);
+    const res = translation[index].isUpdate
       ? await translateStore.update_TRHELPFORM(body)
       : await translateStore.add_TRHELPFORM(body);
-    setLoading(false);
+    setIsSaving(false);
     if (res) {
       console.log("data is saved");
       fetchData(currentPage);
+      translation[index].isDirty = false;
     }
   };
   const memoizedItems = useMemo(() => items, [items]);
@@ -152,7 +154,7 @@ const Columns = ({ translateStore }) => {
                 );
                 let translationValue;
                 let hasTranslation = false;
-                if (item?.TRLANGS2_SUBFORM.length > 0) {
+                if (item?.TRLANGS2_SUBFORM?.length > 0) {
                   hasTranslation = true;
                   const translations = item.TRLANGS2_SUBFORM.find(
                     (it) => it.LANG === 2
@@ -162,7 +164,6 @@ const Columns = ({ translateStore }) => {
                       translations.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
                   }
                 }
-
                 return (
                   <li
                     key={index}
@@ -173,7 +174,7 @@ const Columns = ({ translateStore }) => {
                       alignItems: "center",
                       margin: "15px 0"
                     }}>
-                    {cleanText.length <= 130 ? (
+                    {cleanText?.length <= 130 ? (
                       <Input
                         label={cleanText}
                         direction={lang === 2 ? "ltr" : "rtl"}
@@ -184,14 +185,18 @@ const Columns = ({ translateStore }) => {
                         )}
                         type="text"
                         onChange={(e) => {
-                          translate({ index, item, value: e.target.value });
-                          setIsUpdate(!!hasTranslation);
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation
+                          });
                         }}
                       />
                     ) : (
                       <TextArea
                         label={cleanText}
-                        rows={Math.ceil(cleanText.length / 80)}
+                        rows={Math.ceil(cleanText?.length / 80)}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={getCleanText(
                           translation && translation[index]
@@ -203,8 +208,12 @@ const Columns = ({ translateStore }) => {
                           textAlign: lang === 2 ? "start" : "end"
                         }}
                         onChange={(e) => {
-                          translate({ index, item, value: e.target.value });
-                          setIsUpdate(!!translationValue);
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation
+                          });
                         }}
                       />
                     )}
@@ -215,9 +224,9 @@ const Columns = ({ translateStore }) => {
                       }
                       onClick={() => handleInputTranslate(index)}
                       style={{ alignSelf: "flex-start" }}>
-                      {isLoading && (
+                      {isSaving && (
                         <div>
-                          <ClipLoader color={"red"} />
+                          <ClipLoader color={"white"} />
                         </div>
                       )}
                       שמור
@@ -228,12 +237,36 @@ const Columns = ({ translateStore }) => {
             </ul>
           </>
         )}
+        {isLoading ? (
+          <></>
+        ) : (
+          <Button
+            width={"12%"}
+            onClick={async () => {
+              Object.entries(translation).map((item, index) => {
+                handleInputTranslate(index);
+              });
+            }}
+            disabled={translation === null}
+            style={{ alignSelf: "flex-start" }}>
+            {isSaving && (
+              <div>
+                <ClipLoader color={"white"} />
+              </div>
+            )}
+            שמור הכל
+          </Button>
+        )}
       </List>
-      <Pagination
-        pageCount={pageCount}
-        pageName={location.pathname}
-        currentPage={currentPage}
-      />
+      {isLoading ? (
+        <></>
+      ) : (
+        <Pagination
+          pageCount={pageCount}
+          pageName={location.pathname}
+          currentPage={currentPage}
+        />
+      )}
     </>
   );
 };
