@@ -14,8 +14,8 @@ const Title = styled.div(() => ({
 
 const List = styled.div(() => ({
   overflowY: "auto",
-  margin: "20px",
-  height: "90vh",
+  margin: "10px 20px",
+  height: "82vh",
   padding: "0 12px",
 
   "&::-webkit-scrollbar": {
@@ -238,28 +238,28 @@ const Screens = ({ translateStore }) => {
             </ul>
           </>
         )}
-         {isLoading ? (
-          <></>
-        ) : (
-          <Button
-            width={"12%"}
-            onClick={async () => {
-              Object.entries(translation).map((item, index) => {
-                handleInputTranslate(index);
-              });
-            }}
-            disabled={translation === null}
-            style={{ alignSelf: "flex-start" }}>
-            {isSaving && (
-              <div>
-                <ClipLoader color={"white"} />
-              </div>
-            )}
-            שמור הכל
-          </Button>
-        )}
       </List>
-  {isLoading ? (
+      {isLoading ? (
+        <></>
+      ) : (
+        <Button
+          width={"12%"}
+          onClick={async () => {
+            Object.entries(translation).map((item, index) => {
+              handleInputTranslate(index);
+            });
+          }}
+          disabled={translation === null}
+          style={{ alignSelf: "flex-start" }}>
+          {isSaving && (
+            <div>
+              <ClipLoader color={"white"} />
+            </div>
+          )}
+          שמור הכל
+        </Button>
+      )}
+      {isLoading ? (
         <></>
       ) : (
         <Pagination
