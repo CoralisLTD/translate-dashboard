@@ -91,6 +91,7 @@ const Input = ({
   innerRef,
   error,
   direction,
+  maxLength,
   ...props
 }) => {
   const { i18n } = useTranslation();
@@ -128,6 +129,7 @@ const Input = ({
           dir={direction}
           placeholder={placeholder}
           disabled={disabled}
+          maxLength={maxLength}
           {...props}
           style={{ ...props.style, marginBottom: 0 }}
         />

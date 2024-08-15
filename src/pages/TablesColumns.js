@@ -124,7 +124,7 @@ const TableColumns = ({ translateStore }) => {
               <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
                 בחזרה לדף הראשי
               </div>
-              <Title>תרגום לעמודות של טבלאות</Title>
+              <Title>תרגום לעמודות של טבלאות (עד 20 תוים לכל ערך)</Title>
             </div>
             <ul style={{ padding: 0 }}>
               <li>
@@ -169,6 +169,7 @@ const TableColumns = ({ translateStore }) => {
                     {item?.TITLE?.length <= 130 ? (
                       <Input
                         label={item?.TITLE}
+                        maxLength={20}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={
                           translation && translation[index]
