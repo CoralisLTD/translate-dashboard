@@ -8,7 +8,7 @@ import { TextArea } from "../UI/src/Input";
 import { Pagination } from "../components/Pagination";
 
 const Title = styled.div(() => ({
-  fontSize: 30
+  fontSize: 30,
 }));
 
 const List = styled.div(() => ({
@@ -21,15 +21,15 @@ const List = styled.div(() => ({
     backgroundColor: "#ffffff",
     borderRadius: "20px",
     scrollbarWidth: "thin",
-    width: "5px"
+    width: "5px",
   },
   "&::-webkit-scrollbar-thumb": {
     background: "#000",
     borderRadius: "20px",
     scrollbarWidth: "thin",
     width: "5px",
-    height: "30%"
-  }
+    height: "30%",
+  },
 }));
 
 const FormColumns = ({ translateStore }) => {
@@ -50,7 +50,7 @@ const FormColumns = ({ translateStore }) => {
     const skip = (page - 1) * itemsPerPage;
     const data = await translateStore.get_TRFORMCLMNS({
       skip,
-      limit: itemsPerPage
+      limit: itemsPerPage,
     });
     const list = data?.filter((item) => {
       if (!item?.TITLE) return false;
@@ -74,8 +74,8 @@ const FormColumns = ({ translateStore }) => {
         FORM: params.item.FORM,
         data: params.value || "",
         isDirty: true,
-        isUpdate: params.isUpdate
-      }
+        isUpdate: params.isUpdate,
+      },
     };
     setTranslation(updatedTranslation);
   };
@@ -84,11 +84,11 @@ const FormColumns = ({ translateStore }) => {
     const body = {
       data: {
         TITLE: translation[index]?.data,
-        LANG: lang
+        LANG: lang,
       },
       FORM: translation[index].FORM,
       NAME: translation[index].NAME,
-      LANG: lang
+      LANG: lang,
     };
     setIsSaving(true);
     const res = translation[index].isUpdate
@@ -120,7 +120,7 @@ const FormColumns = ({ translateStore }) => {
                 display: "flex",
                 flexDirection: "row",
                 gap: "224px",
-                alignItems: "center"
+                alignItems: "center",
               }}>
               <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
                 בחזרה לדף הראשי
@@ -135,12 +135,35 @@ const FormColumns = ({ translateStore }) => {
                     flexDirection: "row",
                     gap: "12px",
                     alignItems: "center",
-                    margin: "15px 0"
+                    margin: "15px 0",
                   }}>
                   <span style={{ width: "342px", textAlign: "start" }}>
                     ערך לתרגום
                   </span>
                   <span>התרגום</span>
+                  {isLoading ? (
+                    <></>
+                  ) : (
+                    <Button
+                      width={"12%"}
+                      onClick={async () => {
+                        Object.entries(translation).map((item, index) => {
+                          handleInputTranslate(index);
+                        });
+                      }}
+                      disabled={translation === null}
+                      style={{
+                        marginInlineStart: "auto",
+                        backgroundColor: "#007bff",
+                      }}>
+                      {isSaving && (
+                        <div>
+                          <ClipLoader color={"white"} />
+                        </div>
+                      )}
+                      שמור הכל
+                    </Button>
+                  )}
                 </div>
               </li>
               {memoizedItems?.map((item, index) => {
@@ -156,100 +179,77 @@ const FormColumns = ({ translateStore }) => {
                     translationValue = translations.TITLE;
                   }
                 }
-                return (
-                  <li
-                    key={index}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "12px",
-                      alignItems: "center",
-                      margin: "15px 0"
-                    }}>
-                    {item?.TITLE?.length <= 130 ? (
-                      <Input
-                        label={item?.TITLE}
-                        direction={lang === 2 ? "ltr" : "rtl"}
-                        value={
-                          translation && translation[index]
-                            ? translation[index]?.data
-                            : translationValue
-                        }
-                        type="text"
-                        onChange={(e) => {
-                          translate({
-                            index,
-                            item,
-                            value: e.target.value,
-                            isUpdate: !!hasTranslation
-                          });
-                        }}
-                      />
-                    ) : (
-                      <TextArea
-                        label={item?.TITLE}
-                        rows={Math.ceil(item?.TITLE?.length / 80)}
-                        direction={lang === 2 ? "ltr" : "rtl"}
-                        value={
-                          translation && translation[index]
-                            ? translation[index]?.data
-                            : translationValue
-                        }
-                        style={{
-                          height: "100%",
-                          textAlign: lang === 2 ? "end" : "start"
-                        }}
-                        onChange={(e) => {
-                          translate({
-                            index,
-                            item,
-                            value: e.target.value,
-                            isUpdate: !!hasTranslation
-                          });
-                        }}
-                      />
-                    )}
-                    <Button
-                      width={"12%"}
-                      onClick={() => handleInputTranslate(index)}
-                      disabled={
-                        translation ? !translation[index]?.isDirty : true
+
+                <li
+                  key={index}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: "12px",
+                    alignItems: "center",
+                    margin: "15px 0",
+                  }}>
+                  {item?.TITLE?.length <= 130 ? (
+                    <Input
+                      label={item?.TITLE}
+                      direction={lang === 2 ? "ltr" : "rtl"}
+                      value={
+                        translation && translation[index]
+                          ? translation[index]?.data
+                          : translationValue
                       }
-                      style={{ alignSelf: "flex-start" }}>
-                      {isSaving && (
-                        <div>
-                          <ClipLoader color={"white"} />
-                        </div>
-                      )}
-                      שמור
-                    </Button>
-                  </li>
-                );
+                      type="text"
+                      onChange={(e) => {
+                        translate({
+                          index,
+                          item,
+                          value: e.target.value,
+                          isUpdate: !!hasTranslation,
+                        });
+                      }}
+                    />
+                  ) : (
+                    <TextArea
+                      label={item?.TITLE}
+                      rows={Math.ceil(item?.TITLE?.length / 80)}
+                      direction={lang === 2 ? "ltr" : "rtl"}
+                      value={
+                        translation && translation[index]
+                          ? translation[index]?.data
+                          : translationValue
+                      }
+                      style={{
+                        height: "100%",
+                        textAlign: lang === 2 ? "end" : "start",
+                      }}
+                      onChange={(e) => {
+                        translate({
+                          index,
+                          item,
+                          value: e.target.value,
+                          isUpdate: !!hasTranslation,
+                        });
+                      }}
+                    />
+                  )}
+                  <Button
+                    width={"12%"}
+                    onClick={() => handleInputTranslate(index)}
+                    disabled={translation ? !translation[index]?.isDirty : true}
+                    style={{ alignSelf: "flex-start" }}>
+                    {isSaving && (
+                      <div>
+                        <ClipLoader color={"white"} />
+                      </div>
+                    )}
+                    שמור
+                  </Button>
+                </li>;
               })}
             </ul>
           </>
         )}
       </List>
-      {isLoading ? (
-        <></>
-      ) : (
-        <Button
-          width={"12%"}
-          onClick={async () => {
-            Object.entries(translation).map((item, index) => {
-              handleInputTranslate(index);
-            });
-          }}
-          disabled={translation === null}
-          style={{ alignSelf: "flex-start" }}>
-          {isSaving && (
-            <div>
-              <ClipLoader color={"white"} />
-            </div>
-          )}
-          שמור הכל
-        </Button>
-      )}
       {isLoading ? (
         <></>
       ) : (

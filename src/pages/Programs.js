@@ -8,7 +8,7 @@ import { TextArea } from "../UI/src/Input";
 import { Pagination } from "../components/Pagination";
 
 const Title = styled.div(() => ({
-  fontSize: 30
+  fontSize: 30,
 }));
 
 const List = styled.div(() => ({
@@ -21,15 +21,15 @@ const List = styled.div(() => ({
     backgroundColor: "#ffffff",
     borderRadius: "20px",
     scrollbarWidth: "thin",
-    width: "5px"
+    width: "5px",
   },
   "&::-webkit-scrollbar-thumb": {
     background: "#000",
     borderRadius: "20px",
     scrollbarWidth: "thin",
     width: "5px",
-    height: "30%"
-  }
+    height: "30%",
+  },
 }));
 
 const Programs = ({ translateStore }) => {
@@ -50,7 +50,7 @@ const Programs = ({ translateStore }) => {
     const skip = (page - 1) * itemsPerPage;
     const data = await translateStore.get_TRPROGPARAM({
       skip,
-      limit: itemsPerPage
+      limit: itemsPerPage,
     });
     const list = data?.filter((item) => {
       if (!item?.TITLE) return false;
@@ -74,8 +74,8 @@ const Programs = ({ translateStore }) => {
         PROG: params.item.PROG,
         data: params.value || "",
         isDirty: true,
-        isUpdate: params.isUpdate
-      }
+        isUpdate: params.isUpdate,
+      },
     };
     setTranslation(updatedTranslation);
   };
@@ -84,11 +84,11 @@ const Programs = ({ translateStore }) => {
     const body = {
       data: {
         TITLE: translation[index]?.data,
-        LANG: lang
+        LANG: lang,
       },
       NAME: translation[index].NAME,
       PROG: translation[index].PROG,
-      LANG: lang
+      LANG: lang,
     };
     setLoading(true);
     const res = translation[index].isUpdate
@@ -120,7 +120,7 @@ const Programs = ({ translateStore }) => {
                 display: "flex",
                 flexDirection: "row",
                 gap: "224px",
-                alignItems: "center"
+                alignItems: "center",
               }}>
               <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
                 בחזרה לדף הראשי
@@ -135,17 +135,41 @@ const Programs = ({ translateStore }) => {
                     flexDirection: "row",
                     gap: "12px",
                     alignItems: "center",
-                    margin: "15px 0"
+                    margin: "15px 0",
                   }}>
                   <span style={{ width: "342px", textAlign: "start" }}>
                     ערך לתרגום
                   </span>
                   <span>התרגום</span>
+                  {isLoading ? (
+                    <></>
+                  ) : (
+                    <Button
+                      width={"12%"}
+                      onClick={async () => {
+                        Object.entries(translation).map((item, index) => {
+                          handleInputTranslate(index);
+                        });
+                      }}
+                      disabled={translation === null}
+                      style={{
+                        marginInlineStart: "auto",
+                        backgroundColor: "#007bff",
+                      }}>
+                      {isSaving && (
+                        <div>
+                          <ClipLoader color={"white"} />
+                        </div>
+                      )}
+                      שמור הכל
+                    </Button>
+                  )}
                 </div>
               </li>
               {memoizedItems?.map((item, index) => {
                 let translationValue;
                 let hasTranslation = false;
+
                 if (item?.LANGPROGPARAM_SUBFORM?.length > 0) {
                   hasTranslation = true;
                   const translations = item.LANGPROGPARAM_SUBFORM.find(
@@ -163,7 +187,7 @@ const Programs = ({ translateStore }) => {
                       flexDirection: "row",
                       gap: "12px",
                       alignItems: "center",
-                      margin: "15px 0"
+                      margin: "15px 0",
                     }}>
                     {item?.TITLE?.length <= 130 ? (
                       <Input
@@ -180,7 +204,7 @@ const Programs = ({ translateStore }) => {
                             index,
                             item,
                             value: e.target.value,
-                            isUpdate: !!hasTranslation
+                            isUpdate: !!hasTranslation,
                           });
                         }}
                       />
@@ -196,14 +220,14 @@ const Programs = ({ translateStore }) => {
                         }
                         style={{
                           height: "100%",
-                          textAlign: lang === 2 ? "end" : "start"
+                          textAlign: lang === 2 ? "end" : "start",
                         }}
                         onChange={(e) => {
                           translate({
                             index,
                             item,
                             value: e.target.value,
-                            isUpdate: !!hasTranslation
+                            isUpdate: !!hasTranslation,
                           });
                         }}
                       />
@@ -229,26 +253,6 @@ const Programs = ({ translateStore }) => {
           </>
         )}
       </List>
-      {isLoading ? (
-        <></>
-      ) : (
-        <Button
-          width={"12%"}
-          onClick={async () => {
-            Object.entries(translation).map((item, index) => {
-              handleInputTranslate(index);
-            });
-          }}
-          disabled={translation === null}
-          style={{ alignSelf: "flex-start" }}>
-          {isSaving && (
-            <div>
-              <ClipLoader color={"white"} />
-            </div>
-          )}
-          שמור הכל
-        </Button>
-      )}
       {isLoading ? (
         <></>
       ) : (

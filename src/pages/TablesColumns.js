@@ -8,7 +8,7 @@ import { TextArea } from "../UI/src/Input";
 import { Pagination } from "../components/Pagination";
 
 const Title = styled.div(() => ({
-  fontSize: 30
+  fontSize: 30,
 }));
 
 const List = styled.div(() => ({
@@ -21,15 +21,15 @@ const List = styled.div(() => ({
     backgroundColor: "#ffffff",
     borderRadius: "20px",
     scrollbarWidth: "thin",
-    width: "5px"
+    width: "5px",
   },
   "&::-webkit-scrollbar-thumb": {
     background: "#000",
     borderRadius: "20px",
     scrollbarWidth: "thin",
     width: "5px",
-    height: "30%"
-  }
+    height: "30%",
+  },
 }));
 
 const TableColumns = ({ translateStore }) => {
@@ -50,7 +50,7 @@ const TableColumns = ({ translateStore }) => {
     const skip = (page - 1) * itemsPerPage;
     const data = await translateStore.get_TRCOLUMNS({
       skip,
-      limit: itemsPerPage
+      limit: itemsPerPage,
     });
     const list = data?.filter((item) => {
       if (!item?.TITLE) return false;
@@ -74,8 +74,8 @@ const TableColumns = ({ translateStore }) => {
         POS: params.item.POS,
         data: params.value || "",
         isDirty: true,
-        isUpdate: params.isUpdate
-      }
+        isUpdate: params.isUpdate,
+      },
     };
     setTranslation(updatedTranslation);
   };
@@ -84,11 +84,11 @@ const TableColumns = ({ translateStore }) => {
     const body = {
       data: {
         TITLE: translation[index]?.data,
-        LANG: lang
+        LANG: lang,
       },
       TABLE: translation[index].TABLE,
       POS: translation[index].POS,
-      LANG: lang
+      LANG: lang,
     };
     setIsSaving(true);
     const res = translation[index].isUpdate
@@ -119,7 +119,7 @@ const TableColumns = ({ translateStore }) => {
                 display: "flex",
                 flexDirection: "row",
                 gap: "224px",
-                alignItems: "center"
+                alignItems: "center",
               }}>
               <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
                 בחזרה לדף הראשי
@@ -134,12 +134,35 @@ const TableColumns = ({ translateStore }) => {
                     flexDirection: "row",
                     gap: "12px",
                     alignItems: "center",
-                    margin: "15px 0"
+                    margin: "15px 0",
                   }}>
                   <span style={{ width: "342px", textAlign: "start" }}>
                     ערך לתרגום
                   </span>
                   <span>התרגום</span>
+                  {isLoading ? (
+                    <></>
+                  ) : (
+                    <Button
+                      width={"12%"}
+                      onClick={async () => {
+                        Object.entries(translation).map((item, index) => {
+                          handleInputTranslate(index);
+                        });
+                      }}
+                      disabled={translation === null}
+                      style={{
+                        marginInlineStart: "auto",
+                        backgroundColor: "#007bff",
+                      }}>
+                      {isSaving && (
+                        <div>
+                          <ClipLoader color={"white"} />
+                        </div>
+                      )}
+                      שמור הכל
+                    </Button>
+                  )}
                 </div>
               </li>
               {memoizedItems?.map((item, index) => {
@@ -156,6 +179,7 @@ const TableColumns = ({ translateStore }) => {
                     translationValue = translations.TITLE;
                   }
                 }
+
                 return (
                   <li
                     key={index}
@@ -164,7 +188,7 @@ const TableColumns = ({ translateStore }) => {
                       flexDirection: "row",
                       gap: "12px",
                       alignItems: "center",
-                      margin: "15px 0"
+                      margin: "15px 0",
                     }}>
                     {item?.TITLE?.length <= 130 ? (
                       <Input
@@ -182,7 +206,7 @@ const TableColumns = ({ translateStore }) => {
                             index,
                             item,
                             value: e.target.value,
-                            isUpdate: !!hasTranslation
+                            isUpdate: !!hasTranslation,
                           });
                         }}
                       />
@@ -198,14 +222,14 @@ const TableColumns = ({ translateStore }) => {
                         }
                         style={{
                           height: "100%",
-                          textAlign: lang === 2 ? "end" : "start"
+                          textAlign: lang === 2 ? "end" : "start",
                         }}
                         onChange={(e) => {
                           translate({
                             index,
                             item,
                             value: e.target.value,
-                            isUpdate: !!hasTranslation
+                            isUpdate: !!hasTranslation,
                           });
                         }}
                       />
@@ -231,26 +255,6 @@ const TableColumns = ({ translateStore }) => {
           </>
         )}
       </List>
-      {isLoading ? (
-        <></>
-      ) : (
-        <Button
-          width={"12%"}
-          onClick={async () => {
-            Object.entries(translation).map((item, index) => {
-              handleInputTranslate(index);
-            });
-          }}
-          disabled={translation === null}
-          style={{ alignSelf: "flex-start" }}>
-          {isSaving && (
-            <div>
-              <ClipLoader color={"white"} />
-            </div>
-          )}
-          שמור הכל
-        </Button>
-      )}
       {isLoading ? (
         <></>
       ) : (
