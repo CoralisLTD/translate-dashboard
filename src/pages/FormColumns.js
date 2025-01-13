@@ -82,10 +82,7 @@ const FormColumns = ({ translateStore }) => {
 
   const handleInputTranslate = async (index) => {
     const body = {
-      data: {
-        TITLE: translation[index]?.data,
-        LANG: lang,
-      },
+      data: { LANG: lang, TITLE: translation[index]?.data },
       FORM: translation[index].FORM,
       NAME: translation[index].NAME,
       LANG: lang,

@@ -85,11 +85,11 @@ const Screens = ({ translateStore }) => {
   const handleInputTranslate = async (index) => {
     const body = {
       data: {
+        LANG: lang,
         MESSAGE: translation[index]?.data.substring(0, 55),
         LANGTRIGMSGTEXT_SUBFORM: {
           TEXT: translation[index]?.data.substring(55),
         },
-        LANG: lang,
       },
       EXEC: translation[index].EXEC,
       NUM: translation[index].NUM,

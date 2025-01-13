@@ -82,10 +82,7 @@ const ReportsColumns = ({ translateStore }) => {
 
   const handleInputTranslate = async (index) => {
     const body = {
-      data: {
-        TITLE: translation[index]?.data,
-        LANG: lang,
-      },
+      data: { LANG: lang, TITLE: translation[index]?.data },
       EXEC: translation[index].EXEC,
       POS: translation[index].POS,
       LANG: lang,

@@ -35,7 +35,7 @@ const List = styled.div(() => ({
 const TableColumns = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [savingIndex, setSavingIndex] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [lang] = useState(2);
   const [translation, setTranslation] = useState(null);
@@ -82,24 +82,22 @@ const TableColumns = ({ translateStore }) => {
 
   const handleInputTranslate = async (index) => {
     const body = {
-      data: {
-        TITLE: translation[index]?.data,
-        LANG: lang,
-      },
+      data: { LANG: lang, TITLE: translation[index]?.data },
       TABLE: translation[index].TABLE,
       POS: translation[index].POS,
       LANG: lang,
     };
-    setIsSaving(true);
+    setSavingIndex(index);
     const res = translation[index].isUpdate
       ? await translateStore.update_TRCOLUMNS(body)
       : await translateStore.add_TRCOLUMNS(body);
-    setIsSaving(false);
+
     if (res) {
       console.log("data is saved");
       fetchData(currentPage);
       translation[index].isDirty = false;
     }
+    setSavingIndex(null);
   };
   const memoizedItems = useMemo(() => items, [items]);
 
@@ -155,12 +153,13 @@ const TableColumns = ({ translateStore }) => {
                         marginInlineStart: "auto",
                         backgroundColor: "#007bff",
                       }}>
-                      {isSaving && (
+                      {!!savingIndex ? (
                         <div>
                           <ClipLoader color={"white"} />
                         </div>
+                      ) : (
+                        "שמור הכל"
                       )}
-                      שמור הכל
                     </Button>
                   )}
                 </div>
@@ -241,12 +240,13 @@ const TableColumns = ({ translateStore }) => {
                         translation ? !translation[index]?.isDirty : true
                       }
                       style={{ alignSelf: "flex-start" }}>
-                      {isSaving && (
+                      {savingIndex ? (
                         <div>
                           <ClipLoader color={"white"} />
                         </div>
+                      ) : (
+                        "שמור"
                       )}
-                      שמור
                     </Button>
                   </li>
                 );

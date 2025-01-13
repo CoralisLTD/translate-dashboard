@@ -85,10 +85,10 @@ const Parameters = ({ translateStore }) => {
   const handleInputTranslate = async (index) => {
     const body = {
       data: {
+        LANG: lang,
         LANGFORMCLMNHELP2_SUBFORM: {
           TEXT: translation[index]?.data,
         },
-        LANG: lang,
       },
       NAME: translation[index].NAME,
       PROG: translation[index].PROG,

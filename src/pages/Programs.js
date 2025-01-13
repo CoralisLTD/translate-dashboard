@@ -82,10 +82,7 @@ const Programs = ({ translateStore }) => {
 
   const handleInputTranslate = async (index) => {
     const body = {
-      data: {
-        TITLE: translation[index]?.data,
-        LANG: lang,
-      },
+      data: { LANG: lang, TITLE: translation[index]?.data },
       NAME: translation[index].NAME,
       PROG: translation[index].PROG,
       LANG: lang,

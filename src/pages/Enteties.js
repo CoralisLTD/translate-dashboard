@@ -85,10 +85,10 @@ const Screens = ({ translateStore }) => {
   const handleInputTranslate = async (index) => {
     const body = {
       data: {
+        LANG: lang,
         LANGHELP2_SUBFORM: {
           TEXT: translation[index]?.data,
         },
-        LANG: lang,
       },
       ENAME: translation[index].ENAME,
       TYPE: translation[index].TYPE,

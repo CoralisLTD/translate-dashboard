@@ -81,10 +81,7 @@ const Columns = ({ translateStore }) => {
 
   const handleInputTranslate = async (index) => {
     const body = {
-      data: {
-        TITLE: translation[index]?.data,
-        LANG: lang,
-      },
+      data: { LANG: lang, TITLE: translation[index]?.data },
       TNAME: translation[index].TNAME,
       LANG: lang,
     };
@@ -178,7 +175,7 @@ const Columns = ({ translateStore }) => {
                     translationValue = translations.TITLE;
                   }
                 }
-              
+
                 return (
                   <li
                     key={index}
