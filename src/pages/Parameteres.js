@@ -175,7 +175,7 @@ const Parameters = ({ translateStore }) => {
                 let hasTranslation = false;
 
                 let cleanText = getCleanText(
-                  item?.TRFORMCLMNHELP_SUBFORM?.ETITLE
+                  item?.TRFORMCLMNHELP_SUBFORM?.TEXT
                 );
 
                 if (item?.TRLANGS2_SUBFORM?.length > 0) {
@@ -185,7 +185,7 @@ const Parameters = ({ translateStore }) => {
                   );
                   if (translations) {
                     translationValue =
-                      translations.LANGFORMCLMNHELP2_SUBFORM?.ETITLE;
+                      translations.LANGFORMCLMNHELP2_SUBFORM?.TEXT;
                   }
                 }
                 return (

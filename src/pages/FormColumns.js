@@ -178,71 +178,75 @@ const FormColumns = ({ translateStore }) => {
                     translationValue = translations.TITLE;
                   }
                 }
-                <li
-                  key={index}
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: "12px",
-                    alignItems: "center",
-                    margin: "15px 0",
-                  }}>
-                  {item?.TITLE?.length <= 130 ? (
-                    <Input
-                      label={item?.TITLE}
-                      direction={lang === 2 ? "ltr" : "rtl"}
-                      value={
-                        translation && translation[index]
-                          ? translation[index]?.data
-                          : translationValue
-                      }
-                      type="text"
-                      onChange={(e) => {
-                        translate({
-                          index,
-                          item,
-                          value: e.target.value,
-                          isUpdate: !!hasTranslation,
-                        });
-                      }}
-                    />
-                  ) : (
-                    <TextArea
-                      label={item?.TITLE}
-                      rows={Math.ceil(item?.TITLE?.length / 80)}
-                      direction={lang === 2 ? "ltr" : "rtl"}
-                      value={
-                        translation && translation[index]
-                          ? translation[index]?.data
-                          : translationValue
-                      }
-                      style={{
-                        height: "100%",
-                        textAlign: lang === 2 ? "end" : "start",
-                      }}
-                      onChange={(e) => {
-                        translate({
-                          index,
-                          item,
-                          value: e.target.value,
-                          isUpdate: !!hasTranslation,
-                        });
-                      }}
-                    />
-                  )}
-                  <Button
-                    width={"12%"}
-                    onClick={() => handleInputTranslate(index)}
-                    disabled={translation ? !translation[index]?.isDirty : true}
-                    style={{ alignSelf: "flex-start" }}>
-                    {isSaving && (
-                      <div>
-                        <ClipLoader color={"white"} />
-                      </div>
+                return (
+                  <li
+                    key={index}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: "12px",
+                      alignItems: "center",
+                      margin: "15px 0",
+                    }}>
+                    {item?.TITLE?.length <= 130 ? (
+                      <Input
+                        label={item?.TITLE}
+                        direction={lang === 2 ? "ltr" : "rtl"}
+                        value={
+                          translation && translation[index]
+                            ? translation[index]?.data
+                            : translationValue
+                        }
+                        type="text"
+                        onChange={(e) => {
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation,
+                          });
+                        }}
+                      />
+                    ) : (
+                      <TextArea
+                        label={item?.TITLE}
+                        rows={Math.ceil(item?.TITLE?.length / 80)}
+                        direction={lang === 2 ? "ltr" : "rtl"}
+                        value={
+                          translation && translation[index]
+                            ? translation[index]?.data
+                            : translationValue
+                        }
+                        style={{
+                          height: "100%",
+                          textAlign: lang === 2 ? "end" : "start",
+                        }}
+                        onChange={(e) => {
+                          translate({
+                            index,
+                            item,
+                            value: e.target.value,
+                            isUpdate: !!hasTranslation,
+                          });
+                        }}
+                      />
                     )}
-                    שמור
-                  </Button>
-                </li>;
+                    <Button
+                      width={"12%"}
+                      onClick={() => handleInputTranslate(index)}
+                      disabled={
+                        translation ? !translation[index]?.isDirty : true
+                      }
+                      style={{ alignSelf: "flex-start" }}>
+                      {isSaving && (
+                        <div>
+                          <ClipLoader color={"white"} />
+                        </div>
+                      )}
+                      שמור
+                    </Button>
+                  </li>
+                );
               })}
             </ul>
           </>
