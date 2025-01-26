@@ -164,6 +164,8 @@ const FormColumns = ({ translateStore }) => {
                 </div>
               </li>
               {memoizedItems?.map((item, index) => {
+                console.log("memoizedItems", memoizedItems);
+
                 let translationValue;
                 let hasTranslation = false;
 
@@ -176,7 +178,6 @@ const FormColumns = ({ translateStore }) => {
                     translationValue = translations.TITLE;
                   }
                 }
-
                 <li
                   key={index}
                   style={{

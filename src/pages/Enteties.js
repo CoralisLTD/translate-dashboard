@@ -33,7 +33,7 @@ const List = styled.div(() => ({
   },
 }));
 
-const Screens = ({ translateStore }) => {
+const Enteties = ({ translateStore }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -184,7 +184,7 @@ const Screens = ({ translateStore }) => {
                     (it) => it.LANG === 2
                   );
                   if (translations) {
-                    translationValue = translations.TEXT;
+                    translationValue = translations.LANGHELP2_SUBFORM.TEXT;
                     translationValue = getCleanText(translationValue);
                   }
                 }
@@ -295,4 +295,4 @@ const Screens = ({ translateStore }) => {
   );
 };
 
-export default inject("translateStore")(observer(Screens));
+export default inject("translateStore")(observer(Enteties));
