@@ -203,7 +203,7 @@ const Parameters = ({ translateStore }) => {
                         label={cleanText}
                         direction={lang === 2 ? "ltr" : "rtl"}
                         value={getCleanText(
-                          !!(translation && translation[index])
+                          translation && translation[index]
                             ? translation[index]?.data
                             : translationValue
                         )}

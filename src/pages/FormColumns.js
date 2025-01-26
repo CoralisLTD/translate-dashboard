@@ -164,8 +164,6 @@ const FormColumns = ({ translateStore }) => {
                 </div>
               </li>
               {memoizedItems?.map((item, index) => {
-                console.log("memoizedItems", memoizedItems);
-
                 let translationValue;
                 let hasTranslation = false;
 
