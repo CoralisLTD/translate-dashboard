@@ -54,9 +54,7 @@ const Parameters = ({ translateStore }) => {
       limit: itemsPerPage,
     });
     const list = data?.filter((item) => {
-      let cleanText = !!item?.TRFORMCLMNHELP_SUBFORM?.TEXT
-        ? getCleanText(item?.TRFORMCLMNHELP_SUBFORM?.TEXT)
-        : false;
+      let cleanText = getCleanText(item?.TRFORMCLMNHELP_SUBFORM?.TEXT);
       if (!cleanText) return false;
       return true;
     });
