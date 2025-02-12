@@ -184,7 +184,7 @@ const Enteties = ({ translateStore }) => {
                     (it) => it.LANG === 2
                   );
                   if (translations) {
-                    translationValue = translations.LANGHELP2_SUBFORM.TEXT;
+                    translationValue = translations.LANGHELP2_SUBFORM?.TEXT;
                     translationValue = getCleanText(translationValue);
                   }
                 }
@@ -262,26 +262,6 @@ const Enteties = ({ translateStore }) => {
           </>
         )}
       </List>
-      {isLoading ? (
-        <></>
-      ) : (
-        <Button
-          width={"12%"}
-          onClick={async () => {
-            Object.entries(translation).map((item, index) => {
-              handleInputTranslate(index);
-            });
-          }}
-          disabled={translation === null}
-          style={{ alignSelf: "flex-start" }}>
-          {isSaving && (
-            <div>
-              <ClipLoader color={"white"} />
-            </div>
-          )}
-          שמור הכל
-        </Button>
-      )}
       {isLoading ? (
         <></>
       ) : (
