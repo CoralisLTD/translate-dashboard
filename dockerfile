@@ -1,22 +1,20 @@
-# Use a lightweight Node.js base image
-FROM node:18-alpine
+# Use a Debian-based Node.js image
+FROM node:18 AS builder
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json first for efficient caching
-COPY translate-dashboard/package*.json ./
+COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm install --only=production
+RUN npm install --frozen-lockfile
 
-# Copy the rest of the application files
-COPY translate-dashboard ./
-COPY src ./src
-COPY public ./public
+COPY . .
 
-# Expose the port your app runs on (if applicable)
-EXPOSE 3000
+RUN npm run build
 
-# Set the command to start the application
-CMD ["node", "index.js"]
+FROM nginx:alpine
+
+COPY --from=builder /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
